@@ -1,6 +1,8 @@
 #include <memory>
+#include <iostream>
+#include <string>
 
-using namepsace std;
+using namespace std;
 
 // Abstract Base Class for Leaves
 class Leave {
