@@ -12,13 +12,13 @@ public:
 class AttendanceReport : public ReportGenerator {
 public:
     void generateReport() override {
-        std::cout << "Generating Attendance Report...\n";
+        cout << "Generating Attendance Report...\n";
     }
 };
 
 class LeaveReport : public ReportGenerator {
 public:
     void generateReport() override {
-        std::cout << "Generating Leave Report...\n";
+        cout << "Generating Leave Report...\n";
     }
 };
