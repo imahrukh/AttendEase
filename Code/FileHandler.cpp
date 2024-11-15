@@ -1,19 +1,21 @@
 #include <fstream>
 
+using namespace std;
+
 class FileHandler {
 public:
-    static void saveData(const std::string& filename, const std::string& data) {
+    static void saveData(const string& filename, const string& data) {
         ofstream file(filename);
         if (file.is_open()) {
             file << data;
             file.close();
-            std::cout << "Data saved to " << filename << "\n";
+            cout << "Data saved to " << filename << "\n";
         } else {
-            std::cerr << "Error opening file.\n";
+            cerr << "Error opening file.\n";
         }
     }
 
-    static string loadData(const std::string& filename) {
+    static string loadData(const string& filename) {
         ifstream file(filename);
         string data, line;
         if (file.is_open()) {
