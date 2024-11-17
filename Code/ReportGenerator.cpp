@@ -1,4 +1,7 @@
 #include <iostream>
+#include"Employee.cpp"
+#include"Leave.cpp"
+#include <vector>
 
 using namespace std;
 
@@ -9,16 +12,36 @@ public:
     virtual ~ReportGenerator() = default;
 };
 
-class AttendanceReport : public ReportGenerator {
+class AttendanceBelowThresholdReport : public ReportGenerator {
+    const vector<Employee>& employees;
+    float threshold;
+
 public:
+    AttendanceBelowThresholdReport(const std::vector<Employee>& emps, float t)
+        : employees(emps), threshold(t) {}
+
     void generateReport() override {
-        cout << "Generating Attendance Report...\n";
+        cout << "Employees with attendance below " << threshold << "%:\n";
+        for (const auto& emp : employees) {
+            if (emp.calculateAttendancePercentage(160) < threshold) {
+                emp.displayAttendance();
+            }
+        }
     }
 };
 
-class LeaveReport : public ReportGenerator {
+class OutstandingLeavesReport : public ReportGenerator {
+    const vector<std::shared_ptr<Leave>>& leaves;
+
 public:
+    OutstandingLeavesReport(const std::vector<std::shared_ptr<Leave>>& ls) : leaves(ls) {}
+
     void generateReport() override {
-        cout << "Generating Leave Report...\n";
+        cout << "Outstanding Leaves:\n";
+        for (const auto& leave : leaves) {
+            if (leave->getStatus() == "Pending") {
+                leave->displayLeaveDetails();
+            }
+        }
     }
 };
