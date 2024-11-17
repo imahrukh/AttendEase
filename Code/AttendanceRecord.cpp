@@ -4,14 +4,22 @@
 
 using namespace std;
 
-class AttendanceRecord {
+class Attendance {
     string date;
     float hoursWorked;
 
 public:
-    AttendanceRecord(string d, float h) : date(d), hoursWorked(h) {}
+    Attendance(string d, float h) : date(d), hoursWorked(h) {}
 
-    void displayRecord() {
+    float getHoursWorked() const {
+        return hoursWorked;
+    }
+
+    string getDate() const {
+        return date;
+    }
+
+    void displayRecord() const {
         cout << "Date: " << date << ", Hours Worked: " << hoursWorked << "\n";
     }
 };
