@@ -1,24 +1,24 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include "AttendanceRecord.cpp"
 using namespace std;
 
 class Employee {
     int employeeId;
-    std::string name;
-    std::vector<AttendanceRecord> attendanceRecords;
+    string name;
+    vector<AttendanceRecord> attendanceRecords;
 
 public:
-    Employee(int id, std::string n) : employeeId(id), name(n) {}
+    Employee(int id, string n) : employeeId(id), name(n) {}
 
-    void addAttendance(std::string date, float hours) {
+    void addAttendance(string date, float hours) {
         attendanceRecords.emplace_back(date, hours);
     }
 
     void displayAttendance() {
-        std::cout << "Attendance for Employee: " << name << "\n";
-        for (const auto& record : attendanceRecords) {
+        cout << "Attendance for Employee: " << name << "\n";
+        for (auto& record : attendanceRecords) {
             record.displayRecord();
         }
     }

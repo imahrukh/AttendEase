@@ -1,7 +1,11 @@
 #include <iostream>
+#include "Employee.cpp"
+#include "Leave.cpp"
+#include "FileHandler.cpp"
+#include "ReportGenerator.cpp"
 
 using namespace std;
-/*
+
 int main() {
     // Create Employee
     Employee emp(1, "John Doe");
@@ -26,4 +30,3 @@ int main() {
 
     return 0;
 }
-*/
