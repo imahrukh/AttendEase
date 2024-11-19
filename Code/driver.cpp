@@ -1,32 +1,32 @@
+#include "AttendanceManager.h"
+#include "ReportGenerator.h"
+#include "LeaveFactory.h"
+#include "LeaveRequest.h"
 #include <iostream>
-#include "Employee.cpp"
-#include "Leave.cpp"
-#include "FileHandler.cpp"
-#include "ReportGenerator.cpp"
-
-using namespace std;
+#include <ctime>
 
 int main() {
-    // Create Employee
-    Employee emp(1, "John Doe");
-    emp.addAttendance("2023-11-01", 8.0);
-    emp.addAttendance("2023-11-02", 7.5);
-    emp.displayAttendance();
+    AttendanceManager attendanceManager;
+    attendanceManager.addEmployee(Employee(1, "Alice"));
+    attendanceManager.addEmployee(Employee(2, "Bob"));
 
-    // Apply for Leave
-    auto leave = LeaveFactory::createLeave("Casual", "2023-11-05", "2023-11-06", "Family Emergency");
-    leave->applyLeave();
+    attendanceManager.markAttendance(1, 40);
+    attendanceManager.markAttendance(2, 30);
 
-    // Supervisor Approval
-    SupervisorApproval supervisor;
-    supervisor.approveLeave(leave);
+    ReportGenerator reportGenerator(attendanceManager);
+    reportGenerator.generateAttendanceReport(80.0);
 
-    // Generate Reports
-    AttendanceReport attendanceReport;
-    attendanceReport.generateReport();
+    // Example of creating a leave request
+    std::tm from = {};
+    std::tm to = {};
+    Leave* leave = LeaveFactory::createLeave("Casual");
+    LeaveRequest leaveRequest(1, leave, from, to, "Sick");
+    
+    if (leaveRequest.isPending()) {
+        leaveRequest.approve();
+        std::cout << "Leave approved for employee ID: " << 1 << std::endl;
+    }
 
-    LeaveReport leaveReport;
-    leaveReport.generateReport();
-
+    delete leave; // Clean up dynamically allocated memory
     return 0;
 }
