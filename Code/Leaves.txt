@@ -1,0 +1,5 @@
+Id|Type|Start Date|End Date|Reason|Status|Supervisor|Director
+1|Casual|2023-11-05|2023-11-06|Family Emergency|Approved|Yes|N/A
+2|Earned|2023-12-01|2023-12-05|Vacation|Pending|Yes|No
+3|Official|2023-11-10|2023-11-10|Company Meeting|Approved|Yes|N/A
+4|Unpaid|2023-01-01|2023-12-31|Study Leave|Pending|Yes|Yes
