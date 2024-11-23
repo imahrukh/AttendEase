@@ -3,27 +3,29 @@
 
 #include "Reportable.h"
 #include <memory>  // For unique_ptr
+#include <vector>
 #include<iostream>
 
 class ReportManager {
 private:
-    std::unique_ptr<Reportable> report;  // Pointer to the current report type
+    std::vector<std::unique_ptr<Reportable>> reports;  // To store multiple report types
 
 public:
-    // Set the report type dynamically
-    void setReport(std::unique_ptr<Reportable> newReport) {
-        report = std::move(newReport);
+    // Set the report type dynamically (this is now flexible for multiple reports)
+    void addReport(std::unique_ptr<Reportable> newReport) {
+        reports.push_back(std::move(newReport));
     }
 
-    // Generate the selected report
-    void generateReport() {
-        if (report) {
-            report->generateReport();
+    // Generate all selected reports
+    void generateReports() {
+        if (!reports.empty()) {
+            for (auto& report : reports) {
+                report->generateReport();
+            }
         } else {
             std::cout << "No report type selected.\n";
         }
     }
 };
-
 
 #endif // REPORTMANAGER_H
