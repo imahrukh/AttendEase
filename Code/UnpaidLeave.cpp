@@ -1,13 +1,15 @@
 #include "UnpaidLeave.h"
 
-string UnpaidLeave::getLeaveType() const {
-    return "Unpaid Leave";
+UnpaidLeave::UnpaidLeave(int empId, const std::string& start, const std::string& end, const std::string& reason)
+    : Leave(empId, "Unpaid", start, end, reason) {}
+
+void UnpaidLeave::applyLeave() {
+    std::cout << "Applying for Unpaid Leave\n";
+    // Logic for applying unpaid leave
 }
 
-bool UnpaidLeave::isApprovalRequired() const {
-    return true; // Supervisor approval needed
-}
-
-bool UnpaidLeave::isDirectorApprovalRequired() const {
-    return true; // Director approval needed
+void UnpaidLeave::displayLeaveDetails() {
+    std::cout << "Unpaid Leave Details: " << "Employee ID: " << getEmployeeId() 
+              << ", Start: " << getStartDate() << ", End: " << getEndDate() 
+              << ", Reason: " << getReason() << "\n";
 }

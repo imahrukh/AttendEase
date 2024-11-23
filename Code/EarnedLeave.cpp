@@ -1,13 +1,15 @@
 #include "EarnedLeave.h"
 
-string EarnedLeave::getLeaveType() const {
-    return "Earned Leave";
+EarnedLeave::EarnedLeave(int empId, const std::string& start, const std::string& end, const std::string& reason)
+        : Leave(empId, "Earned", start, end, reason) {}
+
+void EarnedLeave:: applyLeave() {
+        std::cout << "Applying for Earned Leave\n";
+        // Logic for applying earned leave
 }
 
-bool EarnedLeave::isApprovalRequired() const {
-    return true; // Supervisor approval needed
-}
-
-bool EarnedLeave::isDirectorApprovalRequired() const {
-    return true; // Director approval needed
-}
+void EarnedLeave::displayLeaveDetails() {
+        std::cout << "Earned Leave Details: " << "Employee ID: " << getEmployeeId() 
+             << ", Start: " << getStartDate() << ", End: " << getEndDate() 
+             << ", Reason: " << getReason() << "\n";
+    }

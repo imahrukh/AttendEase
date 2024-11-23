@@ -7,17 +7,11 @@ using namespace std;
 
 class CasualLeave : public Leave {
 public:
-    CasualLeave(int empId, const string& start, const string& end, const string& reason)
-        : Leave(empId, "Casual", start, end, reason) {}
+    CasualLeave(int empId, const string& start, const string& end, const string& reason);
 
-    void applyLeave() override {
-        cout << "Applying for Casual Leave\n";
-        // Logic for applying casual leave
-    }
+    void applyLeave() override;
 
-    void displayLeaveDetails() override {
-        cout << "Casual Leave Details: " << "Employee ID: " << getEmployeeId() 
-                  << ", Start: " << getStartDate() << ", End: " << getEndDate() 
-                  << ", Reason: " << getReason() << "\n";
-    }
+    void displayLeaveDetails() override ;
 };
+
+#endif // CASUALLEAVE_H

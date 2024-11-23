@@ -3,21 +3,13 @@
 
 #include "Leave.h"
 
-using namespace std;
-
 class OfficialLeave : public Leave {
 public:
-    OfficialLeave(int empId, const string& start, const string& end, const string& reason)
-        : Leave(empId, "Official", start, end, reason) {}
+    OfficialLeave(int empId, const std::string& start, const std::string& end, const std::string& reason);
 
-    void applyLeave() override {
-        cout << "Applying for Official Leave\n";
-        // Logic for applying official leave
-    }
+    void applyLeave() override;
 
-    void displayLeaveDetails() override {
-        cout << "Official Leave Details: " << "Employee ID: " << getEmployeeId() 
-             << ", Start: " << getStartDate() << ", End: " << getEndDate() 
-             << ", Reason: " << getReason() << "\n";
-    }
+    void displayLeaveDetails() override; 
 };
+
+#endif // OFFICIALLEAVE_H
