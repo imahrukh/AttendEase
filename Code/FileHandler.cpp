@@ -1,8 +1,13 @@
 #include "FileHandler.h"
+#include "LeaveFactory.h"
+#include "Employee.h"
+#include "AttendanceRecord.h"
+#include "Leave.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -30,12 +35,17 @@ void FileHandler::readEmployeeData(vector<Employee>& employees) {
             getline(ss, temp, '|'); casualLeaves = std::stoi(temp);
             getline(ss, temp, '|'); earnedLeaves = std::stoi(temp);
 
-            employees.emplace_back(id, name);
-            employees.back().markAttendance("2023-11-01", totalHours);  // This is just an example; you might want to adjust how to set total hours here
+            // Create Employee object and set the data
+            Employee emp(id, name);
+            emp.setTotalHoursWorked(totalHours);
+            emp.setCasualLeaveBalance(casualLeaves);
+            emp.setEarnedLeaveBalance(earnedLeaves);
+            
+            employees.push_back(emp);
         }
         file.close();
     } else {
-        std::cerr << "Error: Unable to open employee data file for reading.\n";
+        cerr << "Error: Unable to open employee data file for reading.\n";
     }
 }
 
@@ -53,7 +63,7 @@ void FileHandler::writeEmployeeData(const Employee& employee) {
     }
 }
 
-// Read attendance data from attendance.txt
+// Read attendance data from attendance.txt for a specific employee
 void FileHandler::readAttendanceData(vector<AttendanceRecord>& attendanceRecords, int employeeId) {
     ifstream file(attendanceFile);
     if (file.is_open()) {
@@ -91,7 +101,7 @@ void FileHandler::writeAttendanceData(const AttendanceRecord& record) {
     }
 }
 
-// Read leave data from leaves.txt
+// Read leave data from leaves.txt and create Leave objects using LeaveFactory
 void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
     ifstream file(leaveFile);
     if (file.is_open()) {
@@ -99,7 +109,7 @@ void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
         while (getline(file, line)) {
             stringstream ss(line);
             int id;
-            string type, startDate, endDate, status, reason, supervisorApproval, directorApproval;
+            string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
 
             string temp;
             getline(ss, temp, '|'); id = std::stoi(temp);
@@ -111,13 +121,17 @@ void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
             getline(ss, supervisorApproval, '|');
             getline(ss, directorApproval, '|');
 
-            Leave* leave = LeaveFactory::createLeave(type, startDate, endDate, reason);
+            // Create leave object using LeaveFactory based on the leave type
+            Leave* leave = LeaveFactory::createLeave(type, id, startDate, endDate, reason);
             leave->setStatus(status);
+            leave->setSupervisorApproval(supervisorApproval);
+            leave->setDirectorApproval(directorApproval);
+
             leaveRecords.push_back(leave);
         }
         file.close();
     } else {
-        std::cerr << "Error: Unable to open leave data file for reading.\n";
+        cerr << "Error: Unable to open leave data file for reading.\n";
     }
 }
 
@@ -147,9 +161,11 @@ void FileHandler::updateLeaveStatus(int employeeId, const std::string& leaveType
             int id;
             string type, startDate, endDate, reason, currentStatus, supervisorApproval, directorApproval;
             getline(ss, temp, '|'); id = std::stoi(temp);
-            
+
             if (id == employeeId && type == leaveType) {
-                currentStatus = status;
+                currentStatus = status;  // Update status to the provided status
+            } else {
+                currentStatus = leaveType; // leave the status unchanged
             }
 
             // Write the updated leave data to temp file
