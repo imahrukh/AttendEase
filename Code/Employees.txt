@@ -1,0 +1,3 @@
+Employee ID|Name|Total Hours Worked|Casual Leave Balance|Earned Leave Balance|Role
+1|John Doe|120|15|21|Supervisor
+2|Jane Smith|96|12|20|Employee
