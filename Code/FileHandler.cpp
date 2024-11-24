@@ -9,13 +9,13 @@
 #include <vector>
 #include <memory>
 
-using namespace std;
 
 // Define file names
-const string FileHandler::employeeFile = "employees.txt";
-const string FileHandler::attendanceFile = "attendance.txt";
-const string FileHandler::leaveFile = "leaves.txt";
+const std::string FileHandler::employeeFile = "Employees.txt";
+const std::string FileHandler::attendanceFile = "Attendance.txt";
+const std::string FileHandler::leaveFile = "Leaves.txt";
 
+/*
 // Read employee data from employees.txt and load into Employee objects
 void FileHandler::readEmployeeData(vector<Employee>& employees) {
     ifstream file(employeeFile);
@@ -62,45 +62,105 @@ void FileHandler::writeEmployeeData(const Employee& employee) {
         cerr << "Error: Unable to open employee data file for writing.\n";
     }
 }
-
-// Read attendance data from attendance.txt for a specific employee
-void FileHandler::readAttendanceData(vector<AttendanceRecord>& attendanceRecords, int employeeId) {
-    ifstream file(attendanceFile);
+*/
+// Read attendance data from attendance.txt and load into AttendanceRecord objects
+void FileHandler::readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId) {
+    std::ifstream file(attendanceFile);
     if (file.is_open()) {
-        string line;
+        std::string line;
         while (getline(file, line)) {
-            stringstream ss(line);
-            int id;
-            string date;
+            std::stringstream ss(line);
+            int empId;
+            std::string date;
             float hoursWorked;
 
-            string temp;
-            getline(ss, temp, '|'); id = std::stoi(temp);
-            if (id == employeeId) {
+            std::string temp;
+            getline(ss, temp, '|'); empId = std::stoi(temp);  // Get Employee ID
+            if (empId == employeeId) {  // Check if the employee ID matches
                 getline(ss, date, '|');
                 getline(ss, temp, '|'); hoursWorked = std::stof(temp);
 
-                attendanceRecords.emplace_back(date, hoursWorked);
+                // Find the corresponding AttendanceRecord for the employeeId
+                bool employeeFound = false;
+                for (auto& record : attendanceRecords) {
+                    if (record.getEmployeeId() == employeeId) {
+                        record.addAttendance(date, hoursWorked);  // Add attendance record
+                        employeeFound = true;
+                        break;
+                    }
+                }
+
+                // If employee not found, create a new record for the employee
+                if (!employeeFound) {
+                    AttendanceRecord newRecord(employeeId);
+                    newRecord.addAttendance(date, hoursWorked);
+                    attendanceRecords.push_back(newRecord);
+                }
             }
         }
         file.close();
     } else {
-        cerr << "Error: Unable to open attendance data file for reading.\n";
+        std::cerr << "Error: Unable to open attendance data file for reading.\n";
     }
 }
 
 // Write an attendance record to attendance.txt
 void FileHandler::writeAttendanceData(const AttendanceRecord& record) {
-    ofstream file(attendanceFile, ios::app);
+    std::ofstream file(attendanceFile, std::ios::app);
     if (file.is_open()) {
-        file << record.getEmployeeId() << "|" << record.getDate() << "|"
-             << record.getHoursWorked() << "\n";
+        // Write each attendance record for the employee
+        for (const auto& attendance : record.getRecords()) {
+            file << record.getEmployeeId() << "|" << attendance.getDate() << "|"
+                 << attendance.getHoursWorked() << "\n";
+        }
         file.close();
     } else {
-        cerr << "Error: Unable to open attendance data file for writing.\n";
+        std::cerr << "Error: Unable to open attendance data file for writing.\n";
     }
 }
 
+// Update attendance data (for a specific employee's attendance)
+void FileHandler::updateAttendanceData(int employeeId, const AttendanceRecord& record) {
+    std::ifstream file(attendanceFile);
+    std::ofstream tempFile("temp.txt");
+    std::string line;
+
+    if (file.is_open() && tempFile.is_open()) {
+        while (getline(file, line)) {
+            std::stringstream ss(line);
+            int empId;
+            std::string date;
+            float hoursWorked;
+
+            std::string temp;
+            getline(ss, temp, '|'); empId = std::stoi(temp);
+            getline(ss, date, '|');
+            getline(ss, temp, '|'); hoursWorked = std::stof(temp);
+
+            // If the employee ID matches and we are updating their attendance, modify the record
+            if (empId == employeeId) {
+                for (const auto& attendance : record.getRecords()) {
+                    if (attendance.getDate() == date) {
+                        hoursWorked = attendance.getHoursWorked();  // Update the hours worked
+                    }
+                }
+            }
+
+            // Write the updated or unchanged attendance record to the temp file
+            tempFile << empId << "|" << date << "|" << hoursWorked << "\n";
+        }
+        file.close();
+        tempFile.close();
+
+        // Replace the original file with the updated file
+        remove(attendanceFile.c_str());
+        rename("temp.txt", attendanceFile.c_str());
+    } else {
+        std::cerr << "Error: Unable to open attendance data file for reading or writing.\n";
+    }
+}
+
+/*
 // Read leave data from leaves.txt and create Leave objects using LeaveFactory
 void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
     ifstream file(leaveFile);
@@ -182,3 +242,5 @@ void FileHandler::updateLeaveStatus(int employeeId, const std::string& leaveType
         cerr << "Error: Unable to open leave data file for reading/writing.\n";
     }
 }
+*/
+

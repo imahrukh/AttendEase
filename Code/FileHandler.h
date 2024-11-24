@@ -6,22 +6,22 @@
 #include "Employee.h"
 #include "Leave.h"
 
-using namespace std;
 // Class to handle file reading and writing
 class FileHandler {
 public:
-    static void readEmployeeData(vector<Employee>& employees);
+    static void readEmployeeData(std::vector<Employee>& employees);
     static void writeEmployeeData(const Employee& employee);
-    static void readAttendanceData(vector<AttendanceRecord>& attendanceRecords, int employeeId);
+    static void readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId);
     static void writeAttendanceData(const AttendanceRecord& record);
-    static void readLeaveData(vector<Leave*>& leaveRecords);
+    static void readLeaveData(std::vector<Leave*>& leaveRecords);
     static void writeLeaveData(const Leave& leave);
-    static void updateLeaveStatus(int employeeId, const string& leaveType, const string& status);
+    static void updateLeaveStatus(int employeeId, const std::string& leaveType, const std::string& status);
+    static void updateAttendanceData(int employeeId, const AttendanceRecord& record);
 
 private:
-    static const string employeeFile;
-    static const string attendanceFile;
-    static const string leaveFile;
+    static const std::string employeeFile;
+    static const std::string attendanceFile;
+    static const std::string leaveFile;
 };
 
 #endif // FILEHANDLER_H

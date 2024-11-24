@@ -12,6 +12,13 @@ private:
 public:
     // Constructor
     AttendanceRecord(int empId);
+
+     // Getter for employeeId
+    int getEmployeeId() const ;
+
+    // Setter for employeeId
+    void setEmployeeId(int empId);
+
     // Add an attendance record
     void addAttendance(const std::string& date, float hoursWorked) ;
 
@@ -26,6 +33,12 @@ public:
 
     // Get records
     const std::vector<Attendance>& getRecords() const ;
+
+    // Setter for records (you can use this to replace the entire attendance records)
+    void setRecords(const std::vector<Attendance>& newRecords); 
+
+    // Add an individual attendance entry to the record
+    void addAttendance(const Attendance& attendance);
 };
 
 #endif // ATTENDANCERECORD_H
