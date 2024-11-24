@@ -10,40 +10,40 @@
 class Employee {
 protected:
     int employeeId;
-    string name;
+    std::string name;
     float totalHoursWorked = 0;
     int casualLeaveBalance = 15;
     int earnedLeaveBalance = 21;
-    vector<Leave*> leaveHistory; // Store employee leave records
-    vector<AttendanceRecord> attendanceRecords; // Store employee attendance records
+    std::vector<Leave*> leaveHistory; // Store employee leave records
+    std::vector<AttendanceRecord> attendanceRecords; // Store employee attendance records
 
 public:
-    Employee(int id, const string& n) : employeeId(id), name(n) {}
+    Employee(int id, const std::string& n) : employeeId(id), name(n) {}
 
     // Getters and Setters
     int getEmployeeId() const { return employeeId; }
-    const string& getName() const { return name; }
+    const std::string& getName() const { return name; }
     float getTotalHoursWorked() const { return totalHoursWorked; }
 
     // Methods to apply for leave and display leave details
-    void applyLeave(Leave* leave)=0 ;
+    virtual void applyLeave(Leave* leave) = 0;
     virtual void displayLeaveDetails() = 0;
 
     // Method to check leave balance
-    bool hasSufficientLeave(const string& leaveType, int days) {
+    bool hasSufficientLeave(const std::string& leaveType, int days) {
         if (leaveType == "Casual" && days <= casualLeaveBalance) return true;
         if (leaveType == "Earned" && days <= earnedLeaveBalance) return true;
         return false;
     }
 
     // Method to update leave balance (used after approval)
-    void updateLeaveBalance(const string& leaveType, int days) {
+    void updateLeaveBalance(const std::string& leaveType, int days) {
         if (leaveType == "Casual") casualLeaveBalance -= days;
         if (leaveType == "Earned") earnedLeaveBalance -= days;
     }
 
     // Virtual method to notify employee (Observer Pattern)
-    virtual void notifyLeaveApproval(const string& status) = 0;
+    virtual void notifyLeaveApproval(const std::string& status) = 0;
 
     // Virtual method to check leave requests (Supervisor/Director responsibility)
     virtual void checkLeaveRequests(std::vector<Leave*>& leaveRequests) = 0;
@@ -57,7 +57,6 @@ public:
     // Method to generate attendance report
     void generateAttendanceReport();
 
-    void requestLeave(const string& leaveType, const string& startDate, const string& endDate, const string& reason);
+    void requestLeave(const std::string& leaveType, const std::string& startDate, const std::string& endDate, const std::string& reason);
 };
-
 #endif // EMPLOYEE_H
