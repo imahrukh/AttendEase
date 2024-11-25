@@ -1,9 +1,8 @@
 #include "Director.h"
 #include "Leave.h"
-
-using namespace std;    
+  
 void Director::applyLeave(Leave* leave) {
-    cout << "Director reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
+    std::cout << "Director reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
     // Only approve Earned or Unpaid Leave
     if (leave->getLeaveType() == "Earned" || leave->getLeaveType() == "Unpaid") {
         int leaveDays = 5;  // Earned/Unpaid leave duration (can be customized)
@@ -19,18 +18,18 @@ void Director::applyLeave(Leave* leave) {
 }
 
 void Director::displayLeaveDetails() {
-    cout << "Director's leave approval details for Employee ID: " << employeeId << "\n";
+    std::cout << "Director's leave approval details for Employee ID: " << employeeId << "\n";
 }
 
-void Director::notifyLeaveApproval(const string& status) {
-    cout << "Director has " << status << " the leave request for Employee ID: " << employeeId << ".\n";
+void Director::notifyLeaveApproval(const std::string& status) {
+    std::cout << "Director has " << status << " the leave request for Employee ID: " << employeeId << ".\n";
 }
 
-void Director::checkLeaveRequests(vector<Leave*>& leaveRequests) {
-    cout << "Director checking leave requests...\n";
+void Director::checkLeaveRequests(std::vector<Leave*>& leaveRequests) {
+    std::cout << "Director checking leave requests...\n";
     for (auto& leave : leaveRequests) {
         if (leave->getStatus() == "Pending") {
-            cout << "Leave Request for Employee ID: " << leave->getEmployeeId() << "\n";
+            std::cout << "Leave Request for Employee ID: " << leave->getEmployeeId() << "\n";
             updateLeaveStatus(leave);  // Check leave request and update status
         }
     }
