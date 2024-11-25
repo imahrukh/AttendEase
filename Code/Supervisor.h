@@ -3,17 +3,14 @@
 
 #include "Employee.h"
 
-// Supervisor class inherited from Employee
 class Supervisor : public Employee {
 public:
     Supervisor(int id, const std::string& n) : Employee(id, n) {}
 
-    // Override methods
-    void applyLeave(Leave* leave) override;
+    void applyLeave(std::shared_ptr<Leave> leave) override;
     void displayLeaveDetails() override;
     void notifyLeaveApproval(const std::string& status) override;
-    void checkLeaveRequests(std::vector<Leave*>& leaveRequests) override;
-    void updateLeaveStatus(Leave* leave);
+    void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) override;
 };
 
 #endif // SUPERVISOR_H

@@ -1,44 +1,42 @@
 #ifndef ATTENDANCERECORD_H
 #define ATTENDANCERECORD_H
 
+#include <string>
 #include <vector>
-#include "Attendance.h"
+#include "Attendance.h"  // Include the Attendance class
 
 class AttendanceRecord {
 private:
     int employeeId;
-    std::vector<Attendance> records;  // Collection of attendance entries
+    std::vector<Attendance> records;  // Store attendance entries
 
 public:
     // Constructor
     AttendanceRecord(int empId);
 
-     // Getter for employeeId
-    int getEmployeeId() const ;
-
-    // Setter for employeeId
-    void setEmployeeId(int empId);
-
     // Add an attendance record
-    void addAttendance(const std::string& date, float hoursWorked) ;
+    void addAttendance(const std::string& date, float hoursWorked);
 
     // Get total hours worked
-    float getTotalHoursWorked() const ;
+    float getTotalHoursWorked() const;
 
-    // Get attendance percentage for a given total expected hours
-    float calculateAttendancePercentage(float totalExpectedHours) const ;
+    // Calculate attendance percentage
+    float calculateAttendancePercentage(float totalExpectedHours) const;
 
     // Display all attendance records
     void displayAllAttendance() const;
 
-    // Get records
-    const std::vector<Attendance>& getRecords() const ;
+    // Getter for the attendance records
+    const std::vector<Attendance>& getRecords() const;
 
-    // Setter for records (you can use this to replace the entire attendance records)
-    void setRecords(const std::vector<Attendance>& newRecords); 
+    // Getter for employee ID
+    int getEmployeeId() const;
 
-    // Add an individual attendance entry to the record
-    void addAttendance(const Attendance& attendance);
+    // Getter for attendance date (from the first record)
+    const std::string& getDate() const;
+
+    // Getter for hours worked (from the first record)
+    float getHoursWorked() const;
 };
 
 #endif // ATTENDANCERECORD_H

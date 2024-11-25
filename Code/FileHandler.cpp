@@ -1,6 +1,8 @@
 #include "FileHandler.h"
 #include "LeaveFactory.h"
 #include "Employee.h"
+#include"Supervisor.h"
+#include"Director.h"
 #include "AttendanceRecord.h"
 #include "Leave.h"
 #include <iostream>
@@ -15,54 +17,46 @@ const std::string FileHandler::employeeFile = "Employees.txt";
 const std::string FileHandler::attendanceFile = "Attendance.txt";
 const std::string FileHandler::leaveFile = "Leaves.txt";
 
-/*
-// Read employee data from employees.txt and load into Employee objects
-void FileHandler::readEmployeeData(vector<Employee>& employees) {
-    ifstream file(employeeFile);
+void FileHandler::readEmployeeData(std::vector<std::shared_ptr<Employee>>& employees) {
+    std::ifstream file(employeeFile);
     if (file.is_open()) {
-        string line;
-        while (getline(file, line)) {
-            stringstream ss(line);
+        std::string line;
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
             int id;
-            string name;
+            std::string name, role;
             float totalHours;
             int casualLeaves, earnedLeaves;
 
-            string temp;
-            getline(ss, temp, '|'); id = stoi(temp);
-            getline(ss, name, '|');
-            getline(ss, temp, '|'); totalHours = std::stof(temp);
-            getline(ss, temp, '|'); casualLeaves = std::stoi(temp);
-            getline(ss, temp, '|'); earnedLeaves = std::stoi(temp);
+            std::string temp;
+            std::getline(ss, temp, '|'); id = std::stoi(temp);
+            std::getline(ss, name, '|');
+            std::getline(ss, temp, '|'); totalHours = std::stof(temp);
+            std::getline(ss, temp, '|'); casualLeaves = std::stoi(temp);
+            std::getline(ss, temp, '|'); earnedLeaves = std::stoi(temp);
+            std::getline(ss, role, '|');
 
-            // Create Employee object and set the data
-            Employee emp(id, name);
-            emp.setTotalHoursWorked(totalHours);
-            emp.setCasualLeaveBalance(casualLeaves);
-            emp.setEarnedLeaveBalance(earnedLeaves);
-            
+            std::shared_ptr<Employee> emp;
+            if (role == "Supervisor") {
+                emp = std::make_shared<Supervisor>(id, name);
+            } else if (role == "Director") {
+                emp = std::make_shared<Director>(id, name);
+            } else {
+                emp = std::make_shared<Employee>(id, name);  // default Employee class
+            }
+
+            emp->setTotalHoursWorked(totalHours);
+            emp->setCasualLeaveBalance(casualLeaves);
+            emp->setEarnedLeaveBalance(earnedLeaves);
             employees.push_back(emp);
         }
         file.close();
     } else {
-        cerr << "Error: Unable to open employee data file for reading.\n";
+        std::cerr << "Error: Unable to open employee data file for reading.\n";
     }
 }
 
-// Write employee data to employees.txt
-void FileHandler::writeEmployeeData(const Employee& employee) {
-    ofstream file(employeeFile, ios::app);
-    if (file.is_open()) {
-        file << employee.getId() << "|" << employee.getName() << "|"
-             << employee.getTotalHoursWorked() << "|"
-             << employee.getCasualLeaveBalance() << "|"
-             << employee.getEarnedLeaveBalance() << "\n";
-        file.close();
-    } else {
-        cerr << "Error: Unable to open employee data file for writing.\n";
-    }
-}
-*/
+
 // Read attendance data from attendance.txt and load into AttendanceRecord objects
 void FileHandler::readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId) {
     std::ifstream file(attendanceFile);

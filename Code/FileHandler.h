@@ -10,7 +10,7 @@
 // Class to handle file reading and writing
 class FileHandler {
 public:
-    static void readEmployeeData(std::vector<Employee>& employees);
+    static void readEmployeeData(std::vector<std::shared_ptr<Employee>>& employees);
     static void writeEmployeeData(const Employee& employee);
 
     static void readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId);

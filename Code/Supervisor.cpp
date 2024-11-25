@@ -1,53 +1,29 @@
 #include "Supervisor.h"
-#include "Leave.h"
+#include <iostream>
 
-using namespece std;
-
-void Supervisor::applyLeave(Leave* leave) {
-    cout << "Supervisor reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
-    // Only approve Casual Leave
-    if (leave->getLeaveType() == "Casual") {
-        int leaveDays = 2;  // Casual leave duration (can be customized)
-        if (hasSufficientLeave(leave->getLeaveType(), leaveDays)) {
-            leave->setStatus("Approved");
-            updateLeaveBalance(leave->getLeaveType(), leaveDays);
-        } else {
-            leave->setStatus("Rejected");
-        }
+void Supervisor::applyLeave(std::shared_ptr<Leave> leave) {
+    std::cout << "Supervisor reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
+    if (leave->getLeaveType() == "Casual" && hasSufficientLeave("Casual", 2)) {
+        leave->setStatus("Approved");
+        updateLeaveBalance("Casual", 2);
     } else {
-        leave->setStatus("Rejected");  // Supervisor cannot approve other leave types
+        leave->setStatus("Rejected");
     }
 }
 
 void Supervisor::displayLeaveDetails() {
-    cout << "Supervisor's leave approval details for Employee ID: " << employeeId << "\n";
+    std::cout << "Supervisor's leave approval details for Employee ID: " << getEmployeeId() << "\n";
 }
 
-void Supervisor::notifyLeaveApproval(const string& status) {
-    cout << "Supervisor has " << status << " the leave request for Employee ID: " << employeeId << ".\n";
+void Supervisor::notifyLeaveApproval(const std::string& status) {
+    std::cout << "Supervisor has " << status << " the leave request for Employee ID: " << getEmployeeId() << ".\n";
 }
 
-void Supervisor::checkLeaveRequests(vector<Leave*>& leaveRequests) {
-    cout << "Supervisor checking leave requests...\n";
+void Supervisor::checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) {
+    std::cout << "Supervisor checking leave requests...\n";
     for (auto& leave : leaveRequests) {
         if (leave->getStatus() == "Pending") {
-            cout << "Leave Request for Employee ID: " << leave->getEmployeeId() << "\n";
-            updateLeaveStatus(leave);  // Check leave request and update status
+            applyLeave(leave);
         }
     }
-}
-
-void Supervisor::updateLeaveStatus(Leave* leave) {
-    if (leave->getLeaveType() == "Casual") {
-        int leaveDays = 2;
-        if (hasSufficientLeave(leave->getLeaveType(), leaveDays)) {
-            leave->setStatus("Approved");
-            updateLeaveBalance(leave->getLeaveType(), leaveDays);
-        } else {
-            leave->setStatus("Rejected");
-        }
-    } else {
-        leave->setStatus("Rejected");
-    }
-    notifyLeaveApproval(leave->getStatus());
 }

@@ -1,7 +1,6 @@
 #include "LeaveFactory.h"
 
-std::shared_ptr<Leave> LeaveFactory::createLeave(const std::string& leaveType, int employeeId, const std::string& startDate,
-                                                 const std::string& endDate, const std::string& reason) {
+std::shared_ptr<Leave> LeaveFactory::createLeave(const std::string& leaveType, int employeeId, const std::string& startDate, const std::string& endDate, const std::string& reason) {
     if (leaveType == "Casual") {
         return std::make_shared<CasualLeave>(employeeId, startDate, endDate, reason);
     } else if (leaveType == "Earned") {
