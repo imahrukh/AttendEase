@@ -1,20 +1,6 @@
-#include "Employee.h"
-#include "FileHandler.h"
-#include "Leave.h"
-#include <iostream>
 
-// Constructor
-Employee::Employee(int id, const std::string& n) : employeeId(id), name(n) {}
 
-// Generate leave report
-void Employee::generateLeaveReport() {
-    std::cout << "Leave Report for Employee: " << name << "\n";
-    for (const auto& leave : leaveHistory) {
-        std::cout << "Leave Type: " << leave->getLeaveType() 
-                  << ", Status: " << leave->getStatus()
-                  << ", Duration: " << leave->getDuration() << " days\n";
-    }
-}
+
 
 // Generate attendance report
 void Employee::generateAttendanceReport() {

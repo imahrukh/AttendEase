@@ -53,7 +53,14 @@ public:
     void checkLeaveStatus(int leaveId);
 
     // Method to generate leave report
-    void generateLeaveReport();
+    void generateLeaveReport() {
+        std::cout << "Leave Report for Employee: " << name << "\n";
+        for (const auto& leave : leaveHistory) {
+            std::cout << "Leave Type: " << leave->getLeaveType() 
+                      << ", Status: " << leave->getStatus()
+                      << ", Duration: " << leave->getDuration() << " days\n";
+        }
+}
 
     // Method to generate attendance report
     void generateAttendanceReport();
