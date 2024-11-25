@@ -160,87 +160,96 @@ void FileHandler::updateAttendanceData(int employeeId, const AttendanceRecord& r
     }
 }
 
-
-// Read leave data from leaves.txt and create Leave objects using LeaveFactory
-void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
-    ifstream file(leaveFile);
+// Read leave data from leaves.txt
+void FileHandler::readLeaveData(std::vector<std::shared_ptr<Leave>>& leaveRecords) {
+    std::ifstream file(leaveFile);
     if (file.is_open()) {
-        string line;
-        while (getline(file, line)) {
-            stringstream ss(line);
+        std::string line;
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
             int id;
-            string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
+            int empId;
+            std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
 
-            string temp;
-            getline(ss, temp, '|'); id = std::stoi(temp);
-            getline(ss, type, '|');
-            getline(ss, startDate, '|');
-            getline(ss, endDate, '|');
-            getline(ss, reason, '|');
-            getline(ss, status, '|');
-            getline(ss, supervisorApproval, '|');
-            getline(ss, directorApproval, '|');
+            // Declare 'temp' to temporarily store each field
+            std::string temp;
 
-            // Create leave object using LeaveFactory based on the leave type
-            Leave* leave = LeaveFactory::createLeave(type, id, startDate, endDate, reason);
-            leave->setStatus(status);
-            leave->setSupervisorApproval(supervisorApproval);
-            leave->setDirectorApproval(directorApproval);
+            // Read the data for each field
+            std::getline(ss, temp, '|'); id = std::stoi(temp);  // Read ID and convert to integer
+            std::getline(ss, temp, '|'); empId = std::stoi(temp);  // Read employee ID and convert to integer
+            std::getline(ss, type, '|');  // Read leave type
+            std::getline(ss, startDate, '|');  // Read start date
+            std::getline(ss, endDate, '|');  // Read end date
+            std::getline(ss, reason, '|');  // Read reason
+            std::getline(ss, status, '|');  // Read status
+            std::getline(ss, supervisorApproval, '|');  // Read supervisor approval status
+            std::getline(ss, directorApproval, '|');  // Read director approval status
 
-            leaveRecords.push_back(leave);
+            // Create the appropriate leave object using the LeaveFactory
+            std::shared_ptr<Leave> leave = LeaveFactory::createLeave(type, empId, startDate, endDate, reason);
+            leave->setStatus(status);  // Set the status
+            leave->setSupervisorApproval(supervisorApproval);  // Set supervisor approval
+            leave->setDirectorApproval(directorApproval);  // Set director approval
+
+            leaveRecords.push_back(leave);  // Add the leave object to the records vector
         }
         file.close();
     } else {
-        cerr << "Error: Unable to open leave data file for reading.\n";
+        std::cerr << "Error: Unable to open leave data file for reading.\n";
     }
 }
 
 // Write leave data to leaves.txt
 void FileHandler::writeLeaveData(const Leave& leave) {
-    ofstream file(leaveFile, std::ios::app);
+    std::ofstream file(leaveFile, std::ios::app);
     if (file.is_open()) {
-        file << leave.getEmployeeId() << "|" << leave.getLeaveType() << "|"
-             << leave.getStartDate() << "|" << leave.getEndDate() << "|"
-             << leave.getReason() << "|" << leave.getStatus() << "|"
-             << leave.getSupervisorApproval() << "|" << leave.getDirectorApproval() << "\n";
+        file << leave.getLeaveId() << "|" << leave.getEmployeeId() << "|" << leave.getLeaveType() << "|"
+             << leave.getStartDate() << "|" << leave.getEndDate() << "|" << leave.getReason() << "|"
+             << leave.getStatus() << "|" << leave.getSupervisorApproval() << "|" << leave.getDirectorApproval() << "\n";
         file.close();
     } else {
-        cerr << "Error: Unable to open leave data file for writing.\n";
+        std::cerr << "Error: Unable to open leave data file for writing.\n";
     }
 }
 
 // Update leave status (approve/reject)
-void FileHandler::updateLeaveStatus(int employeeId, const std::string& leaveType, const std::string& status) {
-    ifstream file(leaveFile);
-    ofstream tempFile("temp.txt");
-    string line;
+void FileHandler::updateLeaveStatus(int leaveId, const std::string& newStatus) {
+    std::ifstream file(leaveFile);
+    std::ofstream tempFile("temp.txt");
+    std::string line;
 
     if (file.is_open() && tempFile.is_open()) {
-        while (getline(file, line)) {
-            stringstream ss(line);
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
             int id;
-            string type, startDate, endDate, reason, currentStatus, supervisorApproval, directorApproval;
-            getline(ss, temp, '|'); id = std::stoi(temp);
+            std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
 
-            if (id == employeeId && type == leaveType) {
-                currentStatus = status;  // Update status to the provided status
-            } else {
-                currentStatus = leaveType; // leave the status unchanged
+            std::string temp;
+            std::getline(ss, temp, '|'); id = std::stoi(temp);  // Read ID and convert to integer
+            std::getline(ss, type, '|');  // Read leave type
+            std::getline(ss, startDate, '|');  // Read start date
+            std::getline(ss, endDate, '|');  // Read end date
+            std::getline(ss, reason, '|');  // Read reason
+            std::getline(ss, status, '|');  // Read status
+            std::getline(ss, supervisorApproval, '|');  // Read supervisor approval
+            std::getline(ss, directorApproval, '|');  // Read director approval
+
+            // Update the status if the leave matches the provided leaveId
+            if (id == leaveId) {
+                status = newStatus;  // Update the status
             }
 
-            // Write the updated leave data to temp file
-            tempFile << id << "|" << type << "|" << startDate << "|" << endDate << "|"
-                     << reason << "|" << currentStatus << "|" << supervisorApproval << "|" << directorApproval << "\n";
+            // Write the updated data back to the temporary file
+            tempFile << id << "|" << type << "|" << startDate << "|" << endDate << "|" << reason << "|" 
+                     << status << "|" << supervisorApproval << "|" << directorApproval << "\n";
         }
         file.close();
         tempFile.close();
 
-        // Rename temp file to replace old file
+        // Rename the temporary file to replace the old file
         remove(leaveFile.c_str());
         rename("temp.txt", leaveFile.c_str());
     } else {
-        cerr << "Error: Unable to open leave data file for reading/writing.\n";
+        std::cerr << "Error: Unable to open leave data file for updating.\n";
     }
 }
-
-
