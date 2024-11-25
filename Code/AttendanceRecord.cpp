@@ -34,18 +34,4 @@ int AttendanceRecord::getEmployeeId() const {
     return employeeId;
 }
 
-const std::string& AttendanceRecord::getDate() const {
-    if (!records.empty()) {
-        return records.front().getDate();  // Return the date of the first record
-    }
-    static std::string empty = "";
-    return empty;  // Return empty if no records exist
-}
-
-float AttendanceRecord::getHoursWorked() const {
-    if (!records.empty()) {
-        return records.front().getHoursWorked();  // Return the hours worked of the first record
-    }
-    return 0;  // Return 0 if no records exist
-}
 
