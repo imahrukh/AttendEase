@@ -2,9 +2,10 @@
 #include <iostream>
 #include<vector>
 #include<memory>
+#include<fstream>
+#include <sstream>
 
-
-
+class FileHandler;
 
 class Attendance {
 private:
@@ -266,24 +267,495 @@ public:
 };
 
 
+class Employee {
+protected:
+    int employeeId;
+    std::string name;
+    float totalHoursWorked = 0;
+    int casualLeaveBalance = 15;
+    int earnedLeaveBalance = 21;
+    std::vector<std::shared_ptr<Leave>> leaveHistory; // Store employee leave records using shared_ptr
+    std::vector<AttendanceRecord> attendanceRecords; // Store employee attendance records
+
+public:
+    Employee(int id, const std::string& n) : employeeId(id), name(n) {}
+
+    // Getters and Setters
+    int getEmployeeId() const { return employeeId; }
+    const std::string& getName() const { return name; }
+    float getTotalHoursWorked() const { return totalHoursWorked; }
+    int getCasualLeaveBalance() const { return casualLeaveBalance; }
+    int getEarnedLeaveBalance() const { return earnedLeaveBalance; }
+
+    void setTotalHoursWorked(float hours) { totalHoursWorked = hours; }
+    void setCasualLeaveBalance(int balance) { casualLeaveBalance = balance; }
+    void setEarnedLeaveBalance(int balance) { earnedLeaveBalance = balance; }
+
+    // Methods to apply for leave and display leave details
+    virtual void applyLeave(std::shared_ptr<Leave> leave) = 0;
+    virtual void displayLeaveDetails() = 0;
+
+    // Method to check leave balance
+    bool hasSufficientLeave(const std::string& leaveType, int days) {
+        if (leaveType == "Casual" && casualLeaveBalance >= days) {
+            return true;
+        } else if (leaveType == "Earned" && earnedLeaveBalance >= days) {
+            return true;
+        }
+        return false;
+    }
+    
+    // Method to update leave balance (used after approval)
+    void updateLeaveBalance(const std::string& leaveType, int days){
+        if (leaveType == "Casual") {
+            casualLeaveBalance -= days;
+        } else if (leaveType == "Earned") {
+            earnedLeaveBalance -= days;
+        }
+    }
 
 
+    // Virtual method to notify employee (Observer Pattern)
+    virtual void notifyLeaveApproval(const std::string& status) = 0;
+
+    // Virtual method to check leave requests (Supervisor/Director responsibility)
+    virtual void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) = 0;
+
+    // Method to check leave status
+    void checkLeaveStatus(int leaveId){
+        // Loop through leave history and check for the leave ID
+        for (auto& leave : leaveHistory) {
+            if (leave->getLeaveId() == leaveId) {
+                std::cout << "Leave Status for Employee " << getName() << " (Leave ID: " << leaveId << "): "
+                          << leave->getStatus() << "\n";
+                return;
+            }
+        }
+        std::cout << "Leave not found for Employee " << getName() << " (Leave ID: " << leaveId << ").\n";
+    }
+
+    // Method to generate leave report
+    void generateLeaveReport() {
+        std::cout << "Leave Report for Employee: " << name << "\n";
+        for (const auto& leave : leaveHistory) {
+            std::cout << "Leave Type: " << leave->getLeaveType() 
+                      << ", Status: " << leave->getStatus()
+                      << ", Duration: " << leave->getDuration() << " days\n";
+        }
+    }
+
+    // Method to generate attendance report
+    void generateAttendanceReport(){
+        std::cout << "Attendance Report for Employee: " << name << "\n";
+        for (const auto& record : attendanceRecords) {
+            //std::cout << "Date: " << record.getDate() << ", Hours Worked: " << record.getHoursWorked() << "\n";
+        }
+    }
+
+    void requestLeave(const std::string& leaveType, const std::string& startDate, const std::string& endDate, const std::string& reason){
+        int leaveDays = std::stoi(endDate.substr(8, 2)) - std::stoi(startDate.substr(8, 2)) + 1;
+
+        // Check leave balance
+        if (!hasSufficientLeave(leaveType, leaveDays)) {
+            std::cout << "Insufficient leave balance for " << leaveType << ". Request denied.\n";
+            return;
+        }
+
+        // Create leave using LeaveFactory
+        std::shared_ptr<Leave> newLeave = LeaveFactory::createLeave(leaveType, employeeId, startDate, endDate, reason);
+
+        if (newLeave) {
+            leaveHistory.push_back(newLeave);  // Add to leave history
+
+            // Save the leave to the file using FileHandler
+            FileHandler::writeLeaveData(*newLeave);
+            std::cout << leaveType << " leave request submitted successfully.\n";
+        } else {
+        std::cout << "Invalid leave type provided.\n";
+        }
+    }
+
+    // Method to add attendance record
+    void addAttendanceRecord(const AttendanceRecord& record){
+        attendanceRecords.push_back(record);
+        totalHoursWorked += record.getTotalHoursWorked();
+    }
+};
+
+class Director : public Employee {
+public:
+    Director(int id, const std::string& n) : Employee(id, n) {}
+
+    void applyLeave(std::shared_ptr<Leave> leave) override {
+        std::cout << "Director reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
+        if (leave->getLeaveType() == "Earned" || leave->getLeaveType() == "Unpaid") {
+            if (hasSufficientLeave(leave->getLeaveType(), 5)) {
+                leave->setStatus("Approved");
+                updateLeaveBalance(leave->getLeaveType(), 5);
+            } else {
+                leave->setStatus("Rejected");
+            }
+        } else {
+            leave->setStatus("Rejected");
+        }
+    }
+
+    void displayLeaveDetails() override {
+        std::cout << "Director's leave approval details for Employee ID: " << getEmployeeId() << "\n";
+    }
+
+    void notifyLeaveApproval(const std::string& status) override{
+        std::cout << "Director has " << status << " the leave request for Employee ID: " << getEmployeeId() << ".\n";
+    }
+
+    void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) override{
+        std::cout << "Director checking leave requests...\n";
+        for (auto& leave : leaveRequests) {
+            if (leave->getStatus() == "Pending") {
+                applyLeave(leave);
+            }
+        }
+    }
+};
+
+class Supervisor : public Employee {
+public:
+    Supervisor(int id, const std::string& n) : Employee(id, n) {}
+
+    void applyLeave(std::shared_ptr<Leave> leave) override {
+        std::cout << "Supervisor reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
+        if (leave->getLeaveType() == "Casual" && hasSufficientLeave("Casual", 2)) {
+            leave->setStatus("Approved");
+            updateLeaveBalance("Casual", 2);
+        } else {
+            leave->setStatus("Rejected");
+        }
+    }
+
+    void displayLeaveDetails() override{
+        std::cout << "Supervisor's leave approval details for Employee ID: " << getEmployeeId() << "\n";
+    }
+
+    void notifyLeaveApproval(const std::string& status) override{
+        std::cout << "Supervisor has " << status << " the leave request for Employee ID: " << getEmployeeId() << ".\n";
+    }
+
+    void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) override {
+        std::cout << "Supervisor checking leave requests...\n";
+        for (auto& leave : leaveRequests) {
+            if (leave->getStatus() == "Pending") {
+                applyLeave(leave);
+            }
+        }
+    }
+};
 
 
+// Class to handle file reading and writing
+class FileHandler {
+public:
+    static void readEmployeeData(std::vector<std::shared_ptr<Employee>>& employees) {
+        std::ifstream file(employeeFile);
+        if (file.is_open()) {
+            std::string line;
+            while (std::getline(file, line)) {
+                std::stringstream ss(line);
+                int id;
+                std::string name, role;
+                float totalHours;
+                int casualLeaves, earnedLeaves;
 
+                std::string temp;
+                std::getline(ss, temp, '|'); id = std::stoi(temp);
+                std::getline(ss, name, '|');
+                std::getline(ss, temp, '|'); totalHours = std::stof(temp);
+                std::getline(ss, temp, '|'); casualLeaves = std::stoi(temp);
+                std::getline(ss, temp, '|'); earnedLeaves = std::stoi(temp);
+                std::getline(ss, role, '|');
 
+                std::shared_ptr<Employee> emp;
+                if (role == "Supervisor") {
+                    emp = std::make_shared<Supervisor>(id, name);
+                } else if (role == "Director") {
+                    emp = std::make_shared<Director>(id, name);
+                } else {
+                    emp = std::make_shared<Employee>(id, name);  // default Employee class
+                }
 
+                emp->setTotalHoursWorked(totalHours);
+                emp->setCasualLeaveBalance(casualLeaves);
+                emp->setEarnedLeaveBalance(earnedLeaves);
+                employees.push_back(emp);
+            }
+            file.close();
+        } else {
+            std::cerr << "Error: Unable to open employee data file for reading.\n";
+        }
+    }
 
+    static void writeEmployeeData(const Employee& employee);
 
+    static void readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId) {
+        std::ifstream file(attendanceFile);
+        if (file.is_open()) {
+            std::string line;
+            while (getline(file, line)) {
+                std::stringstream ss(line);
+                int empId;
+                std::string date;
+                float hoursWorked;
 
+                std::string temp;
+                getline(ss, temp, '|'); empId = std::stoi(temp);  // Get Employee ID
+                if (empId == employeeId) {  // Check if the employee ID matches
+                    getline(ss, date, '|');
+                    getline(ss, temp, '|'); hoursWorked = std::stof(temp);
 
+                    // Find the corresponding AttendanceRecord for the employeeId
+                    bool employeeFound = false;
+                    for (auto& record : attendanceRecords) {
+                        if (record.getEmployeeId() == employeeId) {
+                            record.addAttendance(date, hoursWorked);  // Add attendance record
+                            employeeFound = true;
+                            break;
+                        }
+                    }
 
+                    // If employee not found, create a new record for the employee
+                    if (!employeeFound) {
+                        AttendanceRecord newRecord(employeeId);
+                        newRecord.addAttendance(date, hoursWorked);
+                        attendanceRecords.push_back(newRecord);
+                    }
+                }
+            }
+            file.close();
+        } else {
+            std::cerr << "Error: Unable to open attendance data file for reading.\n";
+        }
+    }
 
+    static void writeAttendanceData(const AttendanceRecord& record) {
+        std::ofstream file(attendanceFile, std::ios::app);
+        if (file.is_open()) {
+            for (const auto& attendance : record.getRecords()) {
+                file << record.getEmployeeId() << "|" << attendance.getDate() << "|" << attendance.getHoursWorked() << "\n";
+            }
+            file.close();
+        } else {
+            std::cerr << "Error: Unable to open attendance file for writing.\n";
+        }
+    }
 
+    static void readLeaveData(std::vector<std::shared_ptr<Leave>>& leaveRecords) {
+        std::ifstream file(leaveFile);
+        if (file.is_open()) {
+            std::string line;
+            while (std::getline(file, line)) {
+                std::stringstream ss(line);
+                int id;
+                int empId;
+                std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
 
+                // Declare 'temp' to temporarily store each field
+                std::string temp;
 
+                // Read the data for each field
+                std::getline(ss, temp, '|'); id = std::stoi(temp);  // Read ID and convert to integer
+                std::getline(ss, temp, '|'); empId = std::stoi(temp);  // Read employee ID and convert to integer
+                std::getline(ss, type, '|');  // Read leave type
+                std::getline(ss, startDate, '|');  // Read start date
+                std::getline(ss, endDate, '|');  // Read end date
+                std::getline(ss, reason, '|');  // Read reason
+                std::getline(ss, status, '|');  // Read status
+                std::getline(ss, supervisorApproval, '|');  // Read supervisor approval status
+                std::getline(ss, directorApproval, '|');  // Read director approval status
 
+                // Create the appropriate leave object using the LeaveFactory
+                std::shared_ptr<Leave> leave = LeaveFactory::createLeave(type, empId, startDate, endDate, reason);
+                leave->setStatus(status);  // Set the status
+                leave->setSupervisorApproval(supervisorApproval);  // Set supervisor approval
+                leave->setDirectorApproval(directorApproval);  // Set director approval
 
+                leaveRecords.push_back(leave);  // Add the leave object to the records vector
+            }
+            file.close();
+        } else {
+            std::cerr << "Error: Unable to open leave data file for reading.\n";
+        }
+    }
+
+    static void writeLeaveData(const Leave& leave) {
+        std::ofstream file(leaveFile, std::ios::app);
+        if (file.is_open()) {
+            file << leave.getEmployeeId() << "|" << leave.getLeaveType() << "|"
+                 << leave.getStartDate() << "|" << leave.getEndDate() << "|"
+                 << leave.getReason() << "|" << leave.getStatus() << "\n";
+            file.close();
+        } else {
+            std::cerr << "Error: Unable to open leave file for writing.\n";
+        }
+    }
+
+    static void updateLeaveStatus(int leaveId, const std::string& newStatus) {
+        std::ifstream file(leaveFile);
+        std::ofstream tempFile("temp.txt");
+        std::string line;
+
+        if (file.is_open() && tempFile.is_open()) {
+            while (std::getline(file, line)) {
+                std::stringstream ss(line);
+                int id;
+                std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval;
+
+                std::string temp;
+                std::getline(ss, temp, '|'); id = std::stoi(temp);  // Read ID and convert to integer
+                std::getline(ss, type, '|');  // Read leave type
+                std::getline(ss, startDate, '|');  // Read start date
+                std::getline(ss, endDate, '|');  // Read end date
+                std::getline(ss, reason, '|');  // Read reason
+                std::getline(ss, status, '|');  // Read status
+                std::getline(ss, supervisorApproval, '|');  // Read supervisor approval
+                std::getline(ss, directorApproval, '|');  // Read director approval
+
+                // Update the status if the leave matches the provided leaveId
+                if (id == leaveId) {
+                    status = newStatus;  // Update the status
+                }
+
+                // Write the updated data back to the temporary file
+                tempFile << id << "|" << type << "|" << startDate << "|" << endDate << "|" << reason << "|" 
+                         << status << "|" << supervisorApproval << "|" << directorApproval << "\n";
+            }
+            file.close();
+            tempFile.close();
+
+            // Rename the temporary file to replace the old file
+            remove(leaveFile.c_str());
+            rename("temp.txt", leaveFile.c_str());
+        } else {
+            std::cerr << "Error: Unable to open leave data file for updating.\n";
+        }
+    }
+
+    static void updateAttendanceData(int employeeId, const AttendanceRecord& record) {
+        std::ifstream file(attendanceFile);
+        std::ofstream tempFile("temp.txt");
+        std::string line;
+
+        if (file.is_open() && tempFile.is_open()) {
+            while (getline(file, line)) {
+                std::stringstream ss(line);
+                int empId;
+                std::string date;
+                float hoursWorked;
+
+                std::string temp;
+                getline(ss, temp, '|'); empId = std::stoi(temp);
+                getline(ss, date, '|');
+                getline(ss, temp, '|'); hoursWorked = std::stof(temp);
+
+                // If the employee ID matches and we are updating their attendance, modify the record
+                if (empId == employeeId) {
+                    for (const auto& attendance : record.getRecords()) {
+                        if (attendance.getDate() == date) {
+                            hoursWorked = attendance.getHoursWorked();  // Update the hours worked
+                        }
+                    }
+                }
+
+                // Write the updated or unchanged attendance record to the temp file
+                tempFile << empId << "|" << date << "|" << hoursWorked << "\n";
+            }
+            file.close();
+            tempFile.close();
+
+            // Replace the original file with the updated file
+            remove(attendanceFile.c_str());
+            rename("temp.txt", attendanceFile.c_str());
+        } else {
+            std::cerr << "Error: Unable to open attendance data file for reading or writing.\n";
+        }
+    }
+
+private:
+    static const std::string employeeFile;
+    static const std::string attendanceFile;
+    static const std::string leaveFile;
+};
+
+const std::string FileHandler::employeeFile = "Employees.txt";
+const std::string FileHandler::attendanceFile = "Attendance.txt";
+const std::string FileHandler::leaveFile = "Leaves.txt";
+
+class ReportManager {
+private:
+    std::vector<std::unique_ptr<Reportable>> reports;  // To store multiple report types
+
+public:
+    // Set the report type dynamically (this is now flexible for multiple reports)
+    void addReport(std::unique_ptr<Reportable> newReport) {
+        reports.push_back(std::move(newReport));
+    }
+
+    // Generate all selected reports
+    void generateReports() {
+        if (!reports.empty()) {
+            for (auto& report : reports) {
+                report->generateReport();
+            }
+        } else {
+            std::cout << "No report type selected.\n";
+        }
+    }
+};
+
+class LeaveReport : public Reportable {
+private:
+    std::vector<Leave*> leaveRequests;  // For unapproved leave report
+    std::vector<Leave*> leaveHistory;  // For employee leave details report
+
+public:
+    // Constructor
+    LeaveReport(const std::vector<Leave*>& requests = {}, const std::vector<Leave*>& history = {})
+        : leaveRequests(requests), leaveHistory(history) {}
+
+    // Add leave request for unapproved leave reporting
+    void addLeaveRequest(Leave* leave) {
+        leaveRequests.push_back(leave);
+    }
+
+    // Add leave history for employee leave details
+    void addLeaveHistory(Leave* leave) {
+        leaveHistory.push_back(leave);
+    }
+
+    // Generate report for unapproved leaves
+    void generateUnapprovedLeaveReport() {
+        std::cout << "Unapproved Leave Report\n";
+        for (const auto& leave : leaveRequests) {
+            if (leave->getStatus() == "Pending" || leave->getStatus().empty()) {
+                std::cout << "Employee ID: " << leave->getEmployeeId()
+                          << ", Leave Type: " << leave->getLeaveType()
+                          << ", Status: " << leave->getStatus()
+                          << ", Reason: " << leave->getReason() << "\n";
+            }
+        }
+    }
+
+    // Generate leave details report
+    void generateEmployeeLeaveDetailsReport() {
+        std::cout << "Leave Details Report\n";
+        for (const auto& leave : leaveHistory) {
+            leave->displayLeaveSummary();
+        }
+    }
+
+    // Interface implementation for Reportable
+    void generateReport() override {
+        std::cout << "Leave Report: This is a combined report class. Call specific report methods as needed.\n";
+    }
+};
 
 class OutstandingLeaveReport : public Reportable {
 private:
@@ -305,3 +777,30 @@ public:
         }
     }
 };
+
+class HoursReport : public Reportable {
+private:
+    std::vector<AttendanceRecord> attendanceRecords;
+    float requiredPercentage;
+
+public:
+    // Constructor
+    HoursReport(const std::vector<AttendanceRecord>& records, float percentage)
+        : attendanceRecords(records), requiredPercentage(percentage) {}
+
+    // Generate report for employees with low hours
+    void generateReport() override {
+        const int totalExpectedHours = 40 * 4;  // 40 hours/week * 4 weeks
+        std::cout << "Hours Report (Threshold: " << requiredPercentage << "%)\n";
+        for (const auto& record : attendanceRecords) {
+            float totalHours = record.getTotalHoursWorked();
+            float percentage = (totalHours / totalExpectedHours) * 100;
+
+            if (percentage < requiredPercentage) {
+                std::cout << "Employee ID: " << record.getRecords().front().getHoursWorked()
+                          << ", Total Hours: " << totalHours << " (" << percentage << "%)\n";
+            }
+        }
+    }
+};
+
