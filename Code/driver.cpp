@@ -12,15 +12,15 @@
 using namespace std;
 
 // Function prototypes
-void displayEmployeeMenu(Employee& employee);
+void displayEmployeeMenu(shared_ptr<Employee> employee);
 void displaySupervisorMenu(Supervisor& supervisor, vector<shared_ptr<Leave>>& leaveRequests);
 void displayDirectorMenu(Director& director, vector<shared_ptr<Leave>>& leaveRequests);
 
 // Main Function
 int main() {
     // Load data using FileHandler
-    std::vector<std::shared_ptr<Employee>> employees;
-    vector<shared_ptr<Leave>> leaveRequests;  // Shared pointers for leave requests
+    vector<shared_ptr<Employee>> employees;
+    vector<shared_ptr<Leave>> leaveRequests;
     FileHandler::readEmployeeData(employees);
     FileHandler::readLeaveData(leaveRequests);
 
@@ -37,8 +37,8 @@ int main() {
         cin >> empId;
 
         // Find the employee
-         loggedInEmployee = nullptr;
-        for (auto emp : employees) {
+        shared_ptr<Employee> loggedInEmployee = nullptr;
+        for (auto& emp : employees) {
             if (emp->getEmployeeId() == empId) {
                 loggedInEmployee = emp;
                 break;
@@ -46,7 +46,7 @@ int main() {
         }
 
         if (loggedInEmployee) {
-            displayEmployeeMenu(*loggedInEmployee);
+            displayEmployeeMenu(loggedInEmployee);
         } else {
             cout << "Error: Employee not found!" << endl;
         }
@@ -66,7 +66,7 @@ int main() {
 }
 
 // Function to display Employee Menu
-void displayEmployeeMenu(Employee& employee) {
+void displayEmployeeMenu(shared_ptr<Employee> employee) {
     int option;
     do {
         cout << "\n--- Employee Menu ---" << endl;
@@ -75,7 +75,7 @@ void displayEmployeeMenu(Employee& employee) {
 
         switch (option) {
         case 1:
-            employee.generateAttendanceReport();
+            employee->generateAttendanceReport();
             break;
         case 2: {
             string leaveType, startDate, endDate, reason;
@@ -88,18 +88,18 @@ void displayEmployeeMenu(Employee& employee) {
             cout << "Enter Reason for Leave: ";
             cin.ignore();
             getline(cin, reason);
-            employee.requestLeave(leaveType, startDate, endDate, reason);
+            employee->requestLeave(leaveType, startDate, endDate, reason);
             break;
         }
         case 3: {
             int leaveId;
             cout << "Enter Leave ID to check status: ";
             cin >> leaveId;
-            employee.checkLeaveStatus(leaveId);
+            employee->checkLeaveStatus(leaveId);
             break;
         }
         case 4:
-            employee.generateLeaveReport();
+            employee->generateLeaveReport();
             break;
         case 5:
             cout << "Exiting Employee Menu..." << endl;

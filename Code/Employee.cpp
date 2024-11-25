@@ -1,4 +1,5 @@
 #include "Employee.h"
+#include "FileHandler.h"
 #include "Leave.h"
 #include <iostream>
 
@@ -23,34 +24,31 @@ void Employee::generateAttendanceReport() {
     }
 }
 
+
 //requestLeave method to request leave
 void Employee::requestLeave(const std::string& leaveType, const std::string& startDate, const std::string& endDate, const std::string& reason) {
-    // Check if the employee has sufficient leave balance
-    int leaveDays = 0;
-    if (leaveType == "Casual") {
-        leaveDays = 2;  // Casual leave is for 2 days (can be adjusted)
-    } else if (leaveType == "Earned" || leaveType == "Unpaid") {
-        leaveDays = 5;  // Assume Earned/Unpaid leave is for 5 days (can be adjusted)
-    }
+    int leaveDays = std::stoi(endDate.substr(8, 2)) - std::stoi(startDate.substr(8, 2)) + 1;
 
-    // Check leave balance before applying
+    // Check leave balance
     if (!hasSufficientLeave(leaveType, leaveDays)) {
-        std::cout << "Not enough leave balance to request " << leaveType << " leave.\n";
+        std::cout << "Insufficient leave balance for " << leaveType << ". Request denied.\n";
         return;
     }
 
-    // Create a new leave request object using LeaveFactory and store it as a shared pointer
+    // Create leave using LeaveFactory
     std::shared_ptr<Leave> newLeave = LeaveFactory::createLeave(leaveType, employeeId, startDate, endDate, reason);
 
-    // Add the leave request to the employee's leave history
     if (newLeave) {
-        leaveHistory.push_back(newLeave);
-        // Notify the employee that the leave has been requested
-        std::cout << "Leave requested: " << leaveType << " leave from " << startDate << " to " << endDate << " for reason: " << reason << "\n";
+        leaveHistory.push_back(newLeave);  // Add to leave history
+
+        // Save the leave to the file using FileHandler
+        FileHandler::writeLeaveData(*newLeave);
+        std::cout << leaveType << " leave request submitted successfully.\n";
     } else {
-        std::cout << "Invalid leave type requested.\n";
+        std::cout << "Invalid leave type provided.\n";
     }
 }
+
 
 void Employee::checkLeaveStatus(int leaveId) {
     // Loop through leave history and check for the leave ID
@@ -70,6 +68,7 @@ void Employee::addAttendanceRecord(const AttendanceRecord& record) {
     attendanceRecords.push_back(record);
     totalHoursWorked += record.getTotalHoursWorked();
 }
+
 
 // Method to check if the employee has sufficient leave balance
 bool Employee::hasSufficientLeave(const std::string& leaveType, int days) {

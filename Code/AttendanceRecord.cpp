@@ -48,3 +48,4 @@ float AttendanceRecord::getHoursWorked() const {
     }
     return 0;  // Return 0 if no records exist
 }
+

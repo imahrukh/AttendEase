@@ -98,20 +98,20 @@ void FileHandler::readAttendanceData(std::vector<AttendanceRecord>& attendanceRe
     }
 }
 
+
 // Write an attendance record to attendance.txt
 void FileHandler::writeAttendanceData(const AttendanceRecord& record) {
     std::ofstream file(attendanceFile, std::ios::app);
     if (file.is_open()) {
-        // Write each attendance record for the employee
         for (const auto& attendance : record.getRecords()) {
-            file << record.getEmployeeId() << "|" << attendance.getDate() << "|"
-                 << attendance.getHoursWorked() << "\n";
+            file << record.getEmployeeId() << "|" << attendance.getDate() << "|" << attendance.getHoursWorked() << "\n";
         }
         file.close();
     } else {
-        std::cerr << "Error: Unable to open attendance data file for writing.\n";
+        std::cerr << "Error: Unable to open attendance file for writing.\n";
     }
 }
+
 
 // Update attendance data (for a specific employee's attendance)
 void FileHandler::updateAttendanceData(int employeeId, const AttendanceRecord& record) {
@@ -193,18 +193,20 @@ void FileHandler::readLeaveData(std::vector<std::shared_ptr<Leave>>& leaveRecord
     }
 }
 
+
 // Write leave data to leaves.txt
 void FileHandler::writeLeaveData(const Leave& leave) {
     std::ofstream file(leaveFile, std::ios::app);
     if (file.is_open()) {
-        file << leave.getLeaveId() << "|" << leave.getEmployeeId() << "|" << leave.getLeaveType() << "|"
-             << leave.getStartDate() << "|" << leave.getEndDate() << "|" << leave.getReason() << "|"
-             << leave.getStatus() << "|" << leave.getSupervisorApproval() << "|" << leave.getDirectorApproval() << "\n";
+        file << leave.getEmployeeId() << "|" << leave.getLeaveType() << "|"
+             << leave.getStartDate() << "|" << leave.getEndDate() << "|"
+             << leave.getReason() << "|" << leave.getStatus() << "\n";
         file.close();
     } else {
-        std::cerr << "Error: Unable to open leave data file for writing.\n";
+        std::cerr << "Error: Unable to open leave file for writing.\n";
     }
 }
+
 
 // Update leave status (approve/reject)
 void FileHandler::updateLeaveStatus(int leaveId, const std::string& newStatus) {

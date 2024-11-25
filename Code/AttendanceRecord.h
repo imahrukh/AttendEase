@@ -32,11 +32,6 @@ public:
     // Getter for employee ID
     int getEmployeeId() const;
 
-    // Getter for attendance date (from the first record)
-    const std::string& getDate() const;
-
-    // Getter for hours worked (from the first record)
-    float getHoursWorked() const;
 };
 
 #endif // ATTENDANCERECORD_H
