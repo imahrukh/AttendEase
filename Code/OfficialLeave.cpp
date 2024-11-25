@@ -1,6 +1,5 @@
 #include "OfficialLeave.h"
 
-
 OfficialLeave::OfficialLeave(int empId, const std::string& start, const std::string& end, const std::string& reason)
     : Leave(empId, "Official", start, end, reason) {}
 

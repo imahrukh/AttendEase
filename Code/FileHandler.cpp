@@ -160,7 +160,7 @@ void FileHandler::updateAttendanceData(int employeeId, const AttendanceRecord& r
     }
 }
 
-/*
+
 // Read leave data from leaves.txt and create Leave objects using LeaveFactory
 void FileHandler::readLeaveData(vector<Leave*>& leaveRecords) {
     ifstream file(leaveFile);
@@ -242,5 +242,5 @@ void FileHandler::updateLeaveStatus(int employeeId, const std::string& leaveType
         cerr << "Error: Unable to open leave data file for reading/writing.\n";
     }
 }
-*/
+
 
