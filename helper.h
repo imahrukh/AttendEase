@@ -61,7 +61,6 @@ public:
 
     void displayLeaveSummary() ;
 };
-int Leave::leaveIdCounter = 0;
 
 class AttendanceRecord {
 private:
