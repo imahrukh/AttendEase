@@ -493,7 +493,21 @@ public:
         }
     }
 
-    static void writeEmployeeData(const Employee& employee);
+    static void FileHandler::writeEmployeeData(const Employee& employee) {
+        std::ofstream file(employeeFile, std::ios::app); // Open the file in append mode
+        if (file.is_open()) {
+            // Write the employee data in the specified format
+            file << employee.getEmployeeId() << "|" 
+                 << employee.getName() << "|"
+                 << employee.getTotalHoursWorked() << "|"
+                 << employee.getCasualLeaveBalance() << "|"
+                 << employee.getEarnedLeaveBalance() << "\n";
+            file.close();
+            std::cout << "Employee data written successfully.\n";
+        } else {
+            std::cerr << "Error: Unable to open the employee file for writing.\n";
+        }
+    }
 
     static void readAttendanceData(std::vector<AttendanceRecord>& attendanceRecords, int employeeId) {
         std::ifstream file(attendanceFile);
