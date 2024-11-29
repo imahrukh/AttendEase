@@ -55,11 +55,21 @@ int AttendanceRecord::getEmployeeId() const{
 }
 
 //Constructor
+int Leave::leaveIdCounter = 0;
+
 Leave::Leave(int empId, const std::string& type, const std::string& start, const std::string& end, const std::string& reason)
     : employeeId(empId), leaveType(type), startDate(start), endDate(end), reason(reason), status("Pending"),
       supervisorApproval("N/A"), directorApproval("N/A") {
     leaveId = ++leaveIdCounter;
-    duration = std::stoi(endDate.substr(8, 2)) - std::stoi(startDate.substr(8, 2)) + 1;
+    try {
+        duration = std::stoi(endDate.substr(8, 2)) - std::stoi(startDate.substr(8, 2)) + 1;
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid date format: " << e.what() << '\n';
+        duration = 0;
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Date out of range: " << e.what() << '\n';
+        duration = 0;
+    }
 }
 
     // Getters
