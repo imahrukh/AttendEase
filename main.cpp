@@ -292,8 +292,8 @@ public:
     void setEarnedLeaveBalance(int balance) { earnedLeaveBalance = balance; }
 
     // Methods to apply for leave and display leave details
-    virtual void applyLeave(std::shared_ptr<Leave> leave) = 0;
-    virtual void displayLeaveDetails() = 0;
+    virtual void applyLeave(std::shared_ptr<Leave> leave) ;
+    virtual void displayLeaveDetails();
 
     // Method to check leave balance
     bool hasSufficientLeave(const std::string& leaveType, int days) {
@@ -316,10 +316,10 @@ public:
 
 
     // Virtual method to notify employee (Observer Pattern)
-    virtual void notifyLeaveApproval(const std::string& status) = 0;
+    virtual void notifyLeaveApproval(const std::string& status);
 
     // Virtual method to check leave requests (Supervisor/Director responsibility)
-    virtual void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) = 0;
+    virtual void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests);
 
     // Method to check leave status
     void checkLeaveStatus(int leaveId){
