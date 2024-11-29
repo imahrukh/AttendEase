@@ -917,13 +917,37 @@ int main() {
             break;
         }
         case 2: { // Supervisor Role
-            Supervisor supervisor(999, "Supervisor");
-            displaySupervisorMenu(supervisor, leaveRequests);
+            int empId;
+            std::cout << "Enter your Employee ID: ";
+            std::cin >> empId;
+
+            auto loggedInSupervisor = std::find_if(employees.begin(), employees.end(),
+                                                   [empId](const std::shared_ptr<Employee>& emp) {
+                                                       return emp->getEmployeeId() == empId && dynamic_cast<Supervisor*>(emp.get()) != nullptr;
+                                                   });
+
+            if (loggedInSupervisor != employees.end()) {
+                displaySupervisorMenu(*dynamic_cast<Supervisor*>(loggedInSupervisor->get()), leaveRequests);
+            } else {
+                std::cout << "Error: Supervisor not found!" << std::endl;
+            }
             break;
         }
         case 3: { // Director Role
-            Director director(888, "Director");
-            displayDirectorMenu(director, leaveRequests);
+            int empId;
+            std::cout << "Enter your Employee ID: ";
+            std::cin >> empId;
+
+            auto loggedInDirector = std::find_if(employees.begin(), employees.end(),
+                                                 [empId](const std::shared_ptr<Employee>& emp) {
+                                                     return emp->getEmployeeId() == empId && dynamic_cast<Director*>(emp.get()) != nullptr;
+                                                 });
+
+            if (loggedInDirector != employees.end()) {
+                displayDirectorMenu(*dynamic_cast<Director*>(loggedInDirector->get()), leaveRequests);
+            } else {
+                std::cout << "Error: Director not found!" << std::endl;
+            }
             break;
         }
         case 4: { // Exit
