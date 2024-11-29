@@ -143,6 +143,7 @@ public:
 
     // Method to add attendance record
     void addAttendanceRecord(const AttendanceRecord& record);
+    virtual ~Employee() = default;
 };
 
 class FileHandler {

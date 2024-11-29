@@ -1,10 +1,8 @@
-
 #include "helper.h"
-
+#include <algorithm>
 
   // Constructor
 Attendance::Attendance(const std::string& date, float hours) : date(date), hoursWorked(hours) {}
-
     // Getters
 const std::string& Attendance:: getDate() const { return date; }
 float Attendance:: getHoursWorked() const { return hoursWorked; }
@@ -322,8 +320,11 @@ void Employee::addAttendanceRecord(const AttendanceRecord& record){
     attendanceRecords.push_back(record);
     totalHoursWorked += record.getTotalHoursWorked();
 }
+void Employee::applyLeave(std::shared_ptr<Leave> leave) {}
+void Employee::displayLeaveDetails(){}
 
-
+void Employee:: notifyLeaveApproval(const std::string& status){}
+void Employee::checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests){}
 class Director : public Employee {
 public:
     Director(int id, const std::string& n) : Employee(id, n) {}
@@ -747,101 +748,60 @@ public:
     }
 };
 
-// Function prototypes
-void displayEmployeeMenu(std::shared_ptr<Employee> employee);
-void displaySupervisorMenu(Supervisor& supervisor, std::vector<std::shared_ptr<Leave>>& leaveRequests);
-void displayDirectorMenu(Director& director, std::vector<std::shared_ptr<Leave>>& leaveRequests);
-
-// Main Function
-int main() {
-    // Load data using FileHandler
-    std::vector<std::shared_ptr<Employee>> employees;
-    std::vector<std::shared_ptr<Leave>> leaveRequests;
-    FileHandler::readEmployeeData(employees);
-    FileHandler::readLeaveData(leaveRequests);
-
-    // Role-based system
-    std::cout << "Welcome to Attendance and Leave Management System!" << std::endl;
-    std::cout << "Select your role:\n1. Employee\n2. Supervisor\n3. Director\nEnter your choice: ";
+// Utility function for input validation
+int getValidatedChoice(int min, int max) {
     int choice;
-    std::cin >> choice;
-
-    if (choice == 1) {
-        // Employee Role
-        int empId;
-        std::cout << "Enter your Employee ID: ";
-        std::cin >> empId;
-
-        // Find the employee
-        std::shared_ptr<Employee> loggedInEmployee = nullptr;
-        for (auto& emp : employees) {
-            if (emp->getEmployeeId() == empId) {
-                loggedInEmployee = emp;
-                break;
-            }
-        }
-
-        if (loggedInEmployee) {
-            displayEmployeeMenu(loggedInEmployee);
+    while (true) {
+        std::cin >> choice;
+        if (std::cin.fail() || choice < min || choice > max) {
+            std::cin.clear();          // Clear input stream
+            std::cin.ignore(1000, '\n'); // Ignore invalid input
+            std::cout << "Invalid choice. Please try again: ";
         } else {
-            std::cout << "Error: Employee not found!" << std::endl;
+            return choice;
         }
-    } else if (choice == 2) {
-        // Supervisor Role
-        Supervisor supervisor(999, "Supervisor");  // Temporary supervisor object
-        displaySupervisorMenu(supervisor, leaveRequests);
-    } else if (choice == 3) {
-        // Director Role
-        Director director(888, "Director");  // Temporary director object
-        displayDirectorMenu(director, leaveRequests);
-    } else {
-        std::cout << "Invalid choice. Exiting system." << std::endl;
     }
-
-    return 0;
 }
 
 // Function to display Employee Menu
-void displayEmployeeMenu(std::shared_ptr<Employee> employee) {
+void displayEmployeeMenu(const std::shared_ptr<Employee>& employee) {
     int option;
     do {
-        std::cout << "\n--- Employee Menu ---" <<std:: endl;
+        std::cout << "\n--- Employee Menu ---" << std::endl;
         std::cout << "1. View Attendance Details\n2. Request Leave\n3. View Leave Status\n4. View Leave Report\n5. Exit\nEnter your choice: ";
-        std::cin >> option;
+        option = getValidatedChoice(1, 5);
 
         switch (option) {
-        case 1:
-            employee->generateAttendanceReport();
-            break;
-        case 2: {
-            std::string leaveType, startDate, endDate, reason;
-            std::cout << "Enter Leave Type (Casual/Earned/Official/Unpaid): ";
-            std::cin >> leaveType;
-            std::cout << "Enter Start Date (YYYY-MM-DD): ";
-            std::cin >> startDate;
-            std::cout << "Enter End Date (YYYY-MM-DD): ";
-            std::cin >> endDate;
-            std::cout << "Enter Reason for Leave: ";
-            std::cin.ignore();
-            std::getline(std::cin, reason);
-            employee->requestLeave(leaveType, startDate, endDate, reason);
-            break;
-        }
-        case 3: {
-            int leaveId;
-            std::cout << "Enter Leave ID to check status: ";
-            std::cin >> leaveId;
-            employee->checkLeaveStatus(leaveId);
-            break;
-        }
-        case 4:
-            employee->generateLeaveReport();
-            break;
-        case 5:
-            std::cout << "Exiting Employee Menu..." <<std:: endl;
-            break;
-        default:
-            std::cout << "Invalid option. Try again!" << std::endl;
+            case 1:
+                employee->generateAttendanceReport();
+                break;
+            case 2: {
+                std::string leaveType, startDate, endDate, reason;
+                std::cout << "Enter Leave Type (Casual/Earned/Official/Unpaid): ";
+                std::cin >> leaveType;
+                std::cout << "Enter Start Date (YYYY-MM-DD): ";
+                std::cin >> startDate;
+                std::cout << "Enter End Date (YYYY-MM-DD): ";
+                std::cin >> endDate;
+                std::cout << "Enter Reason for Leave: ";
+                std::cin.ignore();
+                std::getline(std::cin, reason);
+                employee->requestLeave(leaveType, startDate, endDate, reason);
+                break;
+            }
+            case 3: {
+                int leaveId;
+                std::cout << "Enter Leave ID to check status: ";
+                std::cin >> leaveId;
+                employee->checkLeaveStatus(leaveId);
+                break;
+            }
+            case 4:
+                employee->generateLeaveReport();
+                break;
+            case 5:
+                std::cout << "Exiting Employee Menu..." << std::endl;
+                break;
         }
     } while (option != 5);
 }
@@ -852,34 +812,32 @@ void displaySupervisorMenu(Supervisor& supervisor, std::vector<std::shared_ptr<L
     do {
         std::cout << "\n--- Supervisor Menu ---" << std::endl;
         std::cout << "1. View Pending Leave Requests\n2. Approve/Reject Leave\n3. Exit\nEnter your choice: ";
-        std::cin >> option;
+        option = getValidatedChoice(1, 3);
 
         switch (option) {
-        case 1:
-            supervisor.checkLeaveRequests(leaveRequests);
-            break;
-        case 2: {
-            int leaveId;
-            std::string decision;
-            std::cout << "Enter Leave ID to Approve/Reject: ";
-            std::cin >> leaveId;
-            std::cout << "Enter Decision (Approve/Reject): ";
-            std::cin >> decision;
+            case 1:
+                supervisor.checkLeaveRequests(leaveRequests);
+                break;
+            case 2: {
+                int leaveId;
+                std::string decision;
+                std::cout << "Enter Leave ID to Approve/Reject: ";
+                std::cin >> leaveId;
+                std::cout << "Enter Decision (Approve/Reject): ";
+                std::cin >> decision;
 
-            for (auto& leave : leaveRequests) {
-                if (leave->getLeaveId() == leaveId) {
-                    leave->setStatus(decision);
-                    supervisor.notifyLeaveApproval(decision);
-                    break;
+                for (auto& leave : leaveRequests) {
+                    if (leave->getLeaveId() == leaveId) {
+                        leave->setStatus(decision);
+                        supervisor.notifyLeaveApproval(decision);
+                        break;
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case 3:
-            std::cout << "Exiting Supervisor Menu..." << std::endl;
-            break;
-        default:
-            std::cout << "Invalid option. Try again!" << std::endl;
+            case 3:
+                std::cout << "Exiting Supervisor Menu..." << std::endl;
+                break;
         }
     } while (option != 3);
 }
@@ -890,34 +848,90 @@ void displayDirectorMenu(Director& director, std::vector<std::shared_ptr<Leave>>
     do {
         std::cout << "\n--- Director Menu ---" << std::endl;
         std::cout << "1. View Pending Leave Requests\n2. Approve/Reject Leave\n3. Exit\nEnter your choice: ";
-        std::cin >> option;
+        option = getValidatedChoice(1, 3);
 
         switch (option) {
-        case 1:
-            director.checkLeaveRequests(leaveRequests);
-            break;
-        case 2: {
-            int leaveId;
-            std::string decision;
-            std::cout << "Enter Leave ID to Approve/Reject: ";
-            std::cin >> leaveId;
-            std::cout << "Enter Decision (Approve/Reject): ";
-            std::cin >> decision;
+            case 1:
+                director.checkLeaveRequests(leaveRequests);
+                break;
+            case 2: {
+                int leaveId;
+                std::string decision;
+                std::cout << "Enter Leave ID to Approve/Reject: ";
+                std::cin >> leaveId;
+                std::cout << "Enter Decision (Approve/Reject): ";
+                std::cin >> decision;
 
-            for (auto& leave : leaveRequests) {
-                if (leave->getLeaveId() == leaveId) {
-                    leave->setStatus(decision);
-                    director.notifyLeaveApproval(decision);
-                    break;
+                for (auto& leave : leaveRequests) {
+                    if (leave->getLeaveId() == leaveId) {
+                        leave->setStatus(decision);
+                        director.notifyLeaveApproval(decision);
+                        break;
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case 3:
-            std::cout << "Exiting Director Menu..." << std::endl;
-            break;
-        default:
-            std::cout << "Invalid option. Try again!" << std::endl;
+            case 3:
+                std::cout << "Exiting Director Menu..." << std::endl;
+                break;
         }
     } while (option != 3);
 }
+
+// Main Function
+int main() {
+    // Load data using FileHandler
+    std::vector<std::shared_ptr<Employee>> employees;
+    std::vector<std::shared_ptr<Leave>> leaveRequests;
+
+    try {
+        FileHandler::readEmployeeData(employees);
+        FileHandler::readLeaveData(leaveRequests);
+    } catch (const std::exception& ex) {
+        std::cerr << "Error loading data: " << ex.what() << std::endl;
+        return 1; // Exit on critical error
+    }
+
+    // Role-based system
+    std::cout << "Welcome to Attendance and Leave Management System!" << std::endl;
+    std::cout << "Select your role:\n1. Employee\n2. Supervisor\n3. Director\n4. Exit\nEnter your choice: ";
+    int choice = getValidatedChoice(1, 4);
+
+    switch (choice) {
+        case 1: { // Employee Role
+            int empId;
+            std::cout << "Enter your Employee ID: ";
+            std::cin >> empId;
+
+            // Find the employee
+            auto loggedInEmployee = std::find_if(employees.begin(), employees.end(),
+                                                 [empId](const std::shared_ptr<Employee>& emp) {
+                                                     return emp->getEmployeeId() == empId;
+                                                 });
+
+            if (loggedInEmployee != employees.end()) {
+                displayEmployeeMenu(*loggedInEmployee);
+            } else {
+                std::cout << "Error: Employee not found!" << std::endl;
+            }
+            break;
+        }
+        case 2: { // Supervisor Role
+            Supervisor supervisor(999, "Supervisor");
+            displaySupervisorMenu(supervisor, leaveRequests);
+            break;
+        }
+        case 3: { // Director Role
+            Director director(888, "Director");
+            displayDirectorMenu(director, leaveRequests);
+            break;
+        }
+        case 4: { // Exit
+            std::cout << "Exiting system. Goodbye!" << std::endl;
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
