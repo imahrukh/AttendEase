@@ -94,6 +94,7 @@ class Employee {
 protected:
     int employeeId;
     std::string name;
+    std::string role;
     float totalHoursWorked = 0;
     int casualLeaveBalance = 15;
     int earnedLeaveBalance = 21;
@@ -101,11 +102,12 @@ protected:
     std::vector<AttendanceRecord> attendanceRecords; // Store employee attendance records
 
 public:
-    Employee(int id, const std::string& n);
+    Employee(int id, const std::string& n, const std::string& r = "Employee");
 
     // Getters and Setters
     int getEmployeeId() const ;
     const std::string& getName() const ;
+    const std::string& getRole() const ;
     float getTotalHoursWorked() const;
     int getCasualLeaveBalance() const ;
     int getEarnedLeaveBalance() const ;
@@ -164,4 +166,5 @@ private:
 const std::string FileHandler::employeeFile = "Employees.txt";
 const std::string FileHandler::attendanceFile = "Attendance.txt";
 const std::string FileHandler::leaveFile = "Leaves.txt";
+
 #endif // HELPER_H

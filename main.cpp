@@ -235,11 +235,12 @@ public:
     virtual ~Reportable() = default;   // Virtual destructor for proper cleanup
 };
 
-Employee::Employee(int id, const std::string& n) : employeeId(id), name(n) {}
+Employee::Employee(int id, const std::string& n, const std::string& r="Employee") : employeeId(id), name(n), role(r) {}
 
     // Getters and Setters
 int Employee::getEmployeeId() const { return employeeId; }
 const std::string& Employee:: getName() const { return name; }
+const std::string& Employee:: getRole() const { return role; }
 float Employee::getTotalHoursWorked() const { return totalHoursWorked; }
 int Employee::getCasualLeaveBalance() const { return casualLeaveBalance; }
 int Employee::getEarnedLeaveBalance() const { return earnedLeaveBalance; }
@@ -350,7 +351,7 @@ void Employee:: notifyLeaveApproval(const std::string& status){}
 void Employee::checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests){}
 class Director : public Employee {
 public:
-    Director(int id, const std::string& n) : Employee(id, n) {}
+    Director(int id, const std::string& n, const std::string& r ="Employee") : Employee(id, n, r) {}
 
     void applyLeave(std::shared_ptr<Leave> leave) override {
         std::cout << "Director reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
@@ -386,7 +387,7 @@ public:
 
 class Supervisor : public Employee {
 public:
-    Supervisor(int id, const std::string& n) : Employee(id, n) {}
+    Supervisor(int id, const std::string& n, const std::string& r) : Employee(id, n,r) {}
 
     void applyLeave(std::shared_ptr<Leave> leave) override {
         std::cout << "Supervisor reviewing leave request for Employee ID: " << leave->getEmployeeId() << "\n";
@@ -430,6 +431,7 @@ void FileHandler::readEmployeeData(std::vector<std::shared_ptr<Employee>>& emplo
                 std::string temp;
                 std::getline(ss, temp, '|'); id = std::stoi(temp);
                 std::getline(ss, name, '|');
+                std::getline(ss, role, '|');
                 std::getline(ss, temp, '|'); totalHours = std::stof(temp);
                 std::getline(ss, temp, '|'); casualLeaves = std::stoi(temp);
                 std::getline(ss, temp, '|'); earnedLeaves = std::stoi(temp);
@@ -465,6 +467,7 @@ void FileHandler::writeEmployeeData(const Employee& employee) {
         // Write the employee data in the specified format
         file << employee.getEmployeeId() << "|" 
              << employee.getName() << "|"
+             << employee.getRole() << "|"
              << employee.getTotalHoursWorked() << "|"
              << employee.getCasualLeaveBalance() << "|"
              << employee.getEarnedLeaveBalance() << "\n";
@@ -1030,7 +1033,12 @@ int main() {
                                                  });
 
             if (loggedInEmployee != employees.end()) {
-                displayEmployeeMenu(*loggedInEmployee);
+                if ((*loggedInEmployee)->getRole() == "Employee") {
+                    displayEmployeeMenu(*loggedInEmployee);
+                }
+                else {
+                    std::cout << "Error: Invalid role for Employee ID " << empId << std::endl;
+                }
             } else {
                 std::cout << "Error: Employee not found!" << std::endl;
             }
