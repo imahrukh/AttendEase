@@ -115,7 +115,7 @@ public:
     float getTotalHoursWorked() const;
     int getCasualLeaveBalance() const;
     int getEarnedLeaveBalance() const;
-
+    const std::vector<AttendanceRecord>& getAttendanceRecords() const;
     void setTotalHoursWorked(float hours);
     void setCasualLeaveBalance(int balance);
     void setEarnedLeaveBalance(int balance);
