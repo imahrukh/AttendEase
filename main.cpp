@@ -1109,6 +1109,94 @@ public:
     }
 };
 
+// Utility function to validate user input for choosing options
+int getValidatedChoice(int min, int max) {
+    int choice;
+    while (true) {
+        std::cin >> choice;  // Read user input
+        if (std::cin.fail() || choice < min || choice > max) {  // Check for invalid input
+            std::cin.clear();          // Clear input stream
+            std::cin.ignore(1000, '\n'); // Ignore invalid input
+            std::cout << "Invalid choice. Please try again: ";
+        } else {
+            return choice;  // Return valid choice
+        }
+    }
+}
+
+// Function to display a report with low attendance than the threshold
+void showLowAttendanceReport(const std::vector<std::shared_ptr<Employee>>& employees) {
+    const int thresholdHours = 40; // Set the threshold hours for low attendance
+    std::cout << "Low Attendance Report (Threshold: " << thresholdHours << " hours)\n";
+
+    for (const auto& employee : employees) {
+        float totalHours = 0;
+        const auto& records = employee->getAttendanceRecords();
+        for (const auto& record : records) {
+            totalHours += record.getTotalHoursWorked();
+        }
+
+        if (totalHours < thresholdHours) {
+            std::cout << "Employee ID: " << employee->getEmployeeId() << "\n";
+            std::cout << "Name: " << employee->getName() << "\n";
+            std::cout << "Role: " << employee->getRole() << "\n";
+            std::cout << "Total Hours Worked: " << totalHours << "\n";
+            std::cout << "Attendance Records:\n";
+            for (const auto& record : records) {
+                record.displayAllAttendance();
+            }
+            std::cout << "-----------------------------------\n";
+        }
+    }
+}
+
+// Function to display the outstanding leave report
+void showOutstandingLeaveReport(const std::vector<std::shared_ptr<Leave>>& leaveRequests) {
+    std::vector<Leave*> rawLeaveRequests;
+    for (const auto& leave : leaveRequests) {
+        rawLeaveRequests.push_back(leave.get());
+    }
+    OutstandingLeaveReport report(rawLeaveRequests);
+    report.generateReport();
+}
+
+// Function to display the attendance details for a given employee
+void showEmployeeAttendanceDetails(const std::vector<std::shared_ptr<Employee>>& employees) {
+    int empId;
+    std::cout << "Enter Employee ID: ";
+    std::cin >> empId;
+
+    auto employee = std::find_if(employees.begin(), employees.end(),
+                                 [empId](const std::shared_ptr<Employee>& emp) {
+                                     return emp->getEmployeeId() == empId;
+                                 });
+
+    if (employee != employees.end()) {
+        (*employee)->generateAttendanceReport();
+    } else {
+        std::cout << "Error: Employee ID " << empId << " not found.\n";
+    }
+}
+
+// Function to show leave details for a specific employee
+void showEmployeeLeaveDetails(const std::vector<std::shared_ptr<Employee>>& employees) {
+    int empId;
+    std::cout << "Enter Employee ID: ";
+    std::cin >> empId;
+
+    auto employee = std::find_if(employees.begin(), employees.end(),
+                                 [empId](const std::shared_ptr<Employee>& emp) {
+                                     return emp->getEmployeeId() == empId;
+                                 });
+
+    if (employee != employees.end()) {
+        (*employee)->generateLeaveReport();
+    } else {
+        std::cout << "Error: Employee ID " << empId << " not found.\n";
+    }
+}
+
+// Function to display the reports menu
 void generateReportsMenu(const std::vector<std::shared_ptr<Employee>>& employees, const std::vector<std::shared_ptr<Leave>>& leaveRequests) {
     int option;
     do {
@@ -1141,62 +1229,6 @@ void generateReportsMenu(const std::vector<std::shared_ptr<Employee>>& employees
     } while (option != 5);
 }
 
-void showLowAttendanceReport(const std::vector<std::shared_ptr<Employee>>& employees) {
-    float percentage;
-    std::cout << "Enter the attendance percentage threshold: ";
-    std::cin >> percentage;
-
-    std::vector<AttendanceRecord> attendanceRecords;
-    for (const auto& employee : employees) {
-        const auto& records = employee->getAttendanceRecords();
-        attendanceRecords.insert(attendanceRecords.end(), records.begin(), records.end());
-    }
-    HoursReport report(attendanceRecords, percentage);
-    report.generateReport();
-}
-// Function to display the outstanding leave report
-void showOutstandingLeaveReport(const std::vector<std::shared_ptr<Leave>>& leaveRequests) {
-    std::vector<Leave*> rawLeaveRequests;
-    for (const auto& leave : leaveRequests) {
-        rawLeaveRequests.push_back(leave.get());
-    }
-    OutstandingLeaveReport report(rawLeaveRequests);
-    report.generateReport();
-}
-// Function to display the attendance details for a given employee
-void showEmployeeAttendanceDetails(const std::vector<std::shared_ptr<Employee>>& employees) {
-    int empId;
-    std::cout << "Enter Employee ID: ";
-    std::cin >> empId;
-
-    auto employee = std::find_if(employees.begin(), employees.end(),
-                                 [empId](const std::shared_ptr<Employee>& emp) {
-                                     return emp->getEmployeeId() == empId;
-                                 });
-
-    if (employee != employees.end()) {
-        (*employee)->generateAttendanceReport();
-    } else {
-        std::cout << "Error: Employee ID " << empId << " not found.\n";
-    }
-}
-// Function to show leave details for a specific employee
-void showEmployeeLeaveDetails(const std::vector<std::shared_ptr<Employee>>& employees) {
-    int empId;
-    std::cout << "Enter Employee ID: ";
-    std::cin >> empId;
-
-    auto employee = std::find_if(employees.begin(), employees.end(),
-                                 [empId](const std::shared_ptr<Employee>& emp) {
-                                     return emp->getEmployeeId() == empId;
-                                 });
-
-    if (employee != employees.end()) {
-        (*employee)->generateLeaveReport();
-    } else {
-        std::cout << "Error: Employee ID " << empId << " not found.\n";
-    }
-}
 // Function to mark attendance for an employee
 void markAttendance(std::vector<std::shared_ptr<Employee>>& employees) {
     int empId;
@@ -1230,21 +1262,6 @@ void markAttendance(std::vector<std::shared_ptr<Employee>>& employees) {
         }
     } else {
         std::cout << "Error: Employee ID " << empId << " not found.\n";
-    }
-}
-
-// Utility function to validate user input for choosing options
-int getValidatedChoice(int min, int max) {
-    int choice;
-    while (true) {
-        std::cin >> choice;  // Read user input
-        if (std::cin.fail() || choice < min || choice > max) {  // Check for invalid input
-            std::cin.clear();          // Clear input stream
-            std::cin.ignore(1000, '\n'); // Ignore invalid input
-            std::cout << "Invalid choice. Please try again: ";
-        } else {
-            return choice;  // Return valid choice
-        }
     }
 }
 
@@ -1404,10 +1421,10 @@ int main() {
     std::system("cls"); // Clear the console screen
     // Welcome message and role selection menu
     std::cout << "Welcome to Attendance and Leave Management System!" << std::endl;
-    std::cout << "Select your role:\n1. Employee\n2. Supervisor\n3. Director\n4. Exit\nEnter your choice: ";
+    std::cout << "Select your role:\n1. Employee\n2. Supervisor\n3. Director\n4. Mark Attendance\n5. Generate Reports\n6. Exit\nEnter your choice: ";
     
     // Get role choice from the user
-    int choice = getValidatedChoice(1, 4);
+    int choice = getValidatedChoice(1, 6);
 
     switch (choice) {
         case 1: { // Employee Role
