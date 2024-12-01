@@ -1,5 +1,6 @@
 #include "helper.h"
 #include <algorithm>
+#include <cstdlib> 
 
 // Constructor for Attendance class to initialize date and hours worked
 Attendance::Attendance(const std::string& date, float hours) : date(date), hoursWorked(hours) {}
@@ -58,7 +59,6 @@ int AttendanceRecord::getEmployeeId() const {
 // Initialize static leave ID counter
 int Leave::leaveIdCounter = 0;
 
-// Constructor for Leave class to initialize leave details
 Leave::Leave(int empId, const std::string& type, const std::string& start, const std::string& end, const std::string& reason)
     : employeeId(empId), leaveType(type), startDate(start), endDate(end), reason(reason), status("Pending") {
     leaveId = ++leaveIdCounter; // Assign a unique ID to the leave
@@ -72,6 +72,20 @@ Leave::Leave(int empId, const std::string& type, const std::string& start, const
     } catch (const std::exception& e) {
         std::cerr << "Error calculating leave duration: " << e.what() << '\n';
         duration = 0; // Default duration in case of an error
+    }
+
+    // Set initial approval status based on leave type
+    if (leaveType == "Casual") {
+        supervisorApproval = "N/A";
+        directorApproval = "N/A";
+        status = "Approved";
+    } else if (leaveType == "Earned" || leaveType == "Unpaid") {
+        supervisorApproval = "Pending";
+        directorApproval = "Pending";
+    } else if (leaveType == "Official") {
+        supervisorApproval = "N/A";
+        directorApproval = "N/A";
+        status = "Approved";
     }
 }
 
@@ -301,34 +315,142 @@ void Employee::updateLeaveBalance(const std::string& leaveType, int days) {
 
 // Method to check the status of a specific leave by its ID
 void Employee::checkLeaveStatus(int leaveId) {
-    // Loop through the employee's leave history and match the leave ID
-    for (auto& leave : leaveHistory) {
-        if (leave->getLeaveId() == leaveId) {
-            std::cout << "Leave Status for Employee " << getName() << " (Leave ID: " << leaveId << "): "
-                      << leave->getStatus() << "\n"; // Display leave status
-            return;
+    std::ifstream file("Leaves.txt");
+    if (!file.is_open()) {
+        std::cerr << "Error: Unable to open leave data file for reading.\n";
+        return;
+    }
+
+    std::string line;
+    bool leaveFound = false;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        int id, empId;
+        std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval, temp;
+
+        try {
+            // Parse Leave ID from the line
+            if (!std::getline(ss, temp, '|') || temp.empty()) continue;
+            id = std::stoi(temp);
+
+            // Parse Employee ID from the line
+            if (!std::getline(ss, temp, '|') || temp.empty()) continue;
+            empId = std::stoi(temp);
+
+            // Parse other details from the line
+            if (!std::getline(ss, type, '|') || type.empty()) throw std::invalid_argument("Invalid Leave Type");
+            if (!std::getline(ss, startDate, '|') || startDate.empty()) throw std::invalid_argument("Invalid Start Date");
+            if (!std::getline(ss, endDate, '|') || endDate.empty()) throw std::invalid_argument("Invalid End Date");
+            if (!std::getline(ss, reason, '|') || reason.empty()) throw std::invalid_argument("Invalid Reason");
+            if (!std::getline(ss, status, '|') || status.empty()) throw std::invalid_argument("Invalid Status");
+            std::getline(ss, supervisorApproval, '|');
+            std::getline(ss, directorApproval, '|');
+
+            // Check if the Leave ID and Employee ID match
+            if (id == leaveId && empId == employeeId) {
+                std::cout << "Leave Status for Employee " << getName() << " (Leave ID: " << leaveId << "): "
+                          << status << "\n";
+                std::cout << "Supervisor Approval: " << supervisorApproval << "\n";
+                std::cout << "Director Approval: " << directorApproval << "\n";
+                leaveFound = true;
+                break;
+            }
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Error processing line: " << line << " - " << e.what() << '\n';
+        } catch (const std::out_of_range& e) {
+            std::cerr << "Error processing line: " << line << " - " << e.what() << '\n';
         }
     }
-    std::cout << "Leave not found for Employee " << getName() << " (Leave ID: " << leaveId << ").\n"; // If leave not found
+
+    if (!leaveFound) {
+        std::cout << "Leave not found for Employee " << getName() << " (Leave ID: " << leaveId << ").\n";
+    }
+
+    file.close();
 }
 
 // Method to generate a leave report for the employee
 void Employee::generateLeaveReport() {
-    std::cout << "Leave Report for Employee: " << name << "\n";
-    for (const auto& leave : leaveHistory) {
-        // Display details of each leave in the leave history
-        std::cout << "Leave Type: " << leave->getLeaveType() 
-                  << ", Status: " << leave->getStatus()
-                  << ", Duration: " << leave->getDuration() << " days\n";
+    std::ifstream file("Leaves.txt");
+    if (!file.is_open()) {
+        std::cerr << "Error: Unable to open leave data file for reading.\n";
+        return;
     }
+
+    std::string line;
+    bool leaveFound = false;
+    std::cout << "Leave Report for Employee: " << name << "\n";
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        int id, empId;
+        std::string type, startDate, endDate, reason, status, supervisorApproval, directorApproval, temp;
+
+        try {
+            // Parse Leave ID from the line
+            if (!std::getline(ss, temp, '|') || temp.empty()) continue;
+            id = std::stoi(temp);
+
+            // Parse Employee ID from the line
+            if (!std::getline(ss, temp, '|') || temp.empty()) continue;
+            empId = std::stoi(temp);
+
+            // Check if the Employee ID matches
+            if (empId != employeeId) continue;
+
+            // Parse other details from the line
+            if (!std::getline(ss, type, '|') || type.empty()) throw std::invalid_argument("Invalid Leave Type");
+            if (!std::getline(ss, startDate, '|') || startDate.empty()) throw std::invalid_argument("Invalid Start Date");
+            if (!std::getline(ss, endDate, '|') || endDate.empty()) throw std::invalid_argument("Invalid End Date");
+            if (!std::getline(ss, reason, '|') || reason.empty()) throw std::invalid_argument("Invalid Reason");
+            if (!std::getline(ss, status, '|') || status.empty()) throw std::invalid_argument("Invalid Status");
+            std::getline(ss, supervisorApproval, '|');
+            std::getline(ss, directorApproval, '|');
+
+            // Display leave details
+            std::cout << "Leave ID: " << id
+                      << ", Type: " << type
+                      << ", Start Date: " << startDate
+                      << ", End Date: " << endDate
+                      << ", Reason: " << reason
+                      << ", Status: " << status
+                      << ", Supervisor Approval: " << supervisorApproval
+                      << ", Director Approval: " << directorApproval << "\n";
+            leaveFound = true;
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Error processing line: " << line << " - " << e.what() << '\n';
+        } catch (const std::out_of_range& e) {
+            std::cerr << "Error processing line: " << line << " - " << e.what() << '\n';
+        }
+    }
+
+    if (!leaveFound) {
+        std::cout << "No leave records found for Employee " << name << ".\n";
+    }
+
+    file.close();
 }
 
-// Method to generate attendance report for the employee
 void Employee::generateAttendanceReport() {
+    // Clear existing attendance records
+    attendanceRecords.clear();
+
+    // Read attendance data from file
+    FileHandler::readAttendanceData(attendanceRecords);
+
+    // Display employee's basic info
     std::cout << "Attendance Report for Employee: " << name << "\n";
+    std::cout << "Employee ID: " << employeeId << "\n";
+    std::cout << "Role: " << role << "\n";
+    std::cout << "Total Hours Worked: " << totalHoursWorked << "\n";
+    std::cout << "Casual Leave Balance: " << casualLeaveBalance << "\n";
+    std::cout << "Earned Leave Balance: " << earnedLeaveBalance << "\n";
+    std::cout << "Attendance Records:\n";
+
+    // Display attendance records for the employee
     for (const auto& record : attendanceRecords) {
-        // Display attendance details
-        // std::cout << "Date: " << record.getDate() << ", Hours Worked: " << record.getHoursWorked() << "\n";
+        if (record.getEmployeeId() == employeeId) {
+            record.displayAllAttendance();
+        }
     }
 }
 
@@ -347,9 +469,27 @@ void Employee::requestLeave(const std::string& leaveType, const std::string& sta
         return; // Exit function if date parsing fails
     }
 
-    // Check if the employee has enough leave balance
-    if (!hasSufficientLeave(leaveType, leaveDays)) {
-        std::cout << "Insufficient leave balance for " << leaveType << ". Request denied.\n";
+    // Validate leave request based on leave type
+    if (leaveType == "Casual") {
+        if (leaveDays > 4) {
+            std::cout << "Casual leave cannot be more than 4 days. Request denied.\n";
+            return;
+        }
+        if (casualLeaveBalance < leaveDays) {
+            std::cout << "Insufficient casual leave balance. Request denied.\n";
+            return;
+        }
+    } else if (leaveType == "Earned") {
+        if (earnedLeaveBalance < leaveDays) {
+            std::cout << "Insufficient earned leave balance. Request denied.\n";
+            return;
+        }
+    } else if (leaveType == "Official") {
+        leaveDays = 1; // Full credit (8 hours) is awarded
+    } else if (leaveType == "Unpaid") {
+        // No balance check for unpaid leave
+    } else  {
+        std::cout << "Invalid leave type provided. Request denied.\n";
         return;
     }
 
@@ -820,10 +960,10 @@ void FileHandler::updateLeaveStatus(int leaveId, const std::string& newStatus) {
     }
 }
 
-// Method to write a new leave request to the leave data file
+//method to write leave data to the file
 void FileHandler::writeLeaveData(const Leave& leave) {
     // Open the leave file in append mode to add new leave data
-    std::ofstream file(leaveFile, std::ios::app);
+    std::ofstream file("Leaves.txt", std::ios::app);
     if (!file.is_open()) {
         std::cerr << "Error: Unable to open leave file for writing.\n";
         return;  // Exit if file cannot be opened
@@ -839,14 +979,14 @@ void FileHandler::writeLeaveData(const Leave& leave) {
              << leave.getReason() << "|"
              << leave.getStatus() << "|"
              << leave.getSupervisorApproval() << "|"
-             << leave.getDirectorApproval() << "\n";
-    } catch (const std::exception& e) {  // Catch any exception during writing
+             << leave.getDirectorApproval() << "\n";  // Ensure newline character is added
+        std::cout << "Leave data written to file successfully.\n";  // Debugging statement
+    } catch (const std::exception& e) {
         std::cerr << "Error writing leave data: " << e.what() << "\n";
     }
 
     file.close();  // Close the file after writing
 }
-
 class ReportManager {
 private:
     std::vector<std::unique_ptr<Reportable>> reports;  // A container to store various report objects
@@ -1132,7 +1272,7 @@ int main() {
         std::cerr << "Error loading data: " << ex.what() << std::endl;
         return 1; // Exit if critical error occurs while loading data
     }
-
+    std::system("cls"); // Clear the console screen
     // Welcome message and role selection menu
     std::cout << "Welcome to Attendance and Leave Management System!" << std::endl;
     std::cout << "Select your role:\n1. Employee\n2. Supervisor\n3. Director\n4. Exit\nEnter your choice: ";
