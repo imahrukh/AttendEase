@@ -157,7 +157,7 @@ public:
     static void updateLeaveStatus(int leaveId, const std::string& newStatus);
     static void updateAttendanceData(int employeeId, const AttendanceRecord& record);
     static void updateEmployeeData(const Employee& employee);
-
+    static void updateLeaveData(const Leave& leave);
 private:
     static const std::string employeeFile;   // Path to employee data file
     static const std::string attendanceFile; // Path to attendance data file

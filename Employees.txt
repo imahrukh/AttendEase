@@ -1,13 +1,15 @@
-Employee ID|Name|Role|Total Hours Worked|Casual Leave Balance|Earned Leave Balance|Role
-1|John Doe|Employee|120|15|21
-2|Jane Smith|Supervisor|96|12|20
-3|Sam Williams|Employee|140|10|18
-4|Alice Johnson|Employee|80|14|19
-5|Bob Brown|Employee|160|15|21
-6|Charlie Black|Director|110|13|22
-7|Diana White|Employee|130|11|20
-8|Eve Green|Employee|90|14|19
-9|Frank Blue|Supervisor|150|12|23
-10|Grace Pink|Employee|100|15|21
+Employee ID|Name|Role|Total Hours Worked|Casual Leave Balance|Earned Leave Balance
+1|John Doe|Employee|33|14|21
+2|Jane Smith|Supervisor|26|15|20
+3|Sam Williams|Employee|40|15|21
+4|Alice Johnson|Employee|32|15|21
+5|Bob Brown|Employee|40|14|21
+6|Charlie Black|Director|40|14|21
+7|Diana White|Employee|40|15|20
+8|Eve Green|Employee|40|15|21
+9|Frank Blue|Supervisor|40|15|21
+10|Grace Pink|Employee|40|15|21
+
+
 
 

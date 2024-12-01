@@ -570,17 +570,27 @@ public:
     }
 
     // Override checkLeaveRequests to allow the director to review and approve/reject pending leave requests
-    void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) override {
-        std::cout << "Director checking leave requests...\n";
-        // Loop through all leave requests
-        for (auto& leave : leaveRequests) {
-            // If the leave status is "Pending", apply the leave (approve or reject it)
-            if (leave->getStatus() == "Pending") {
-                applyLeave(leave);
+    void checkLeaveRequests(const std::vector<std::shared_ptr<Leave>>& leaveRequests) {
+            std::cout << "Pending Leave Requests:\n";
+            bool foundPending = false;
+            for (const auto& leave : leaveRequests) {
+                if (leave->getStatus() == "Pending") {
+                    std::cout << "Leave ID: " << leave->getLeaveId()
+                              << ", Employee ID: " << leave->getEmployeeId()
+                              << ", Type: " << leave->getLeaveType()
+                              << ", Start Date: " << leave->getStartDate()
+                              << ", End Date: " << leave->getEndDate()
+                              << ", Reason: " << leave->getReason()
+                              << ", Supervisor Approval: " << leave->getSupervisorApproval()
+                              << ", Director Approval: " << leave->getDirectorApproval() << "\n";
+                    foundPending = true;
+                }
+            }   
+            if (!foundPending) {
+                std::cout << "No pending leave requests found.\n";
             }
         }
-    }
-};
+    };
 
 // Supervisor class inherits from Employee and overrides some methods
 class Supervisor : public Employee {
@@ -611,14 +621,24 @@ public:
     }
 
     // Override checkLeaveRequests to allow the supervisor to review and approve/reject pending leave requests
-    void checkLeaveRequests(std::vector<std::shared_ptr<Leave>>& leaveRequests) override {
-        std::cout << "Supervisor checking leave requests...\n";
-        // Loop through all leave requests
-        for (auto& leave : leaveRequests) {
-            // If the leave status is "Pending", apply the leave (approve or reject it)
+    void checkLeaveRequests(const std::vector<std::shared_ptr<Leave>>& leaveRequests) {
+        std::cout << "Pending Leave Requests:\n";
+        bool foundPending = false;
+        for (const auto& leave : leaveRequests) {
             if (leave->getStatus() == "Pending") {
-                applyLeave(leave);
+                std::cout << "Leave ID: " << leave->getLeaveId()
+                          << ", Employee ID: " << leave->getEmployeeId()
+                          << ", Type: " << leave->getLeaveType()
+                        << ", Start Date: " << leave->getStartDate()
+                          << ", End Date: " << leave->getEndDate()
+                          << ", Reason: " << leave->getReason()
+                          << ", Supervisor Approval: " << leave->getSupervisorApproval()
+                          << ", Director Approval: " << leave->getDirectorApproval() << "\n";
+                foundPending = true;
             }
+        }
+        if (!foundPending) {
+            std::cout << "No pending leave requests found.\n";
         }
     }
 };
@@ -965,7 +985,64 @@ void FileHandler::updateLeaveStatus(int leaveId, const std::string& newStatus) {
     }
 }
 
+// Method to update leave data in the file
+void FileHandler:: updateLeaveData(const Leave& leave) {
+    // Open the leave data file for reading and a temporary file for writing updated data
+    std::ifstream file("Leaves.txt");
+    std::ofstream tempFile("temp_leaves.txt");
+    std::string line;
+    bool leaveUpdated = false;
+
+    if (!file.is_open() || !tempFile.is_open()) {
+        std::cerr << "Error: Unable to open leave file for updating.\n";
+        return;
+    }
+
+    // Read the original file line by line
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        int id;
+        std::string temp;
+
+        // Parse Leave ID from the line
+        if (!std::getline(ss, temp, '|') || temp.empty()) continue;
+        id = std::stoi(temp);
+
+     // If the Leave ID matches, update the record
+        if (id == leave.getLeaveId()) {
+            tempFile << leave.getLeaveId() << "|"
+                     << leave.getEmployeeId() << "|"
+                     << leave.getLeaveType() << "|"
+                     << leave.getStartDate() << "|"
+                     << leave.getEndDate() << "|"
+                     << leave.getReason() << "|"
+                     << leave.getStatus() << "|"
+                     << leave.getSupervisorApproval() << "|"
+                     << leave.getDirectorApproval() << "\n";
+            leaveUpdated = true;
+        } else {
+            // Copy unchanged line to the temporary file
+            tempFile << line << "\n";
+        }
+    }
+
+    file.close();
+    tempFile.close();
+
+    // If a leave was updated, replace the original file with the temporary one
+    if (leaveUpdated) {
 //method to write leave data to the file
+if (remove("Leaves.txt") != 0 || rename("temp_leaves.txt", "Leaves.txt") != 0) {
+            std::cerr << "Error: Unable to replace the leave file with updated data.\n";
+        } else {
+            std::cout << "Leave data updated for Leave ID " << leave.getLeaveId() << ".\n";
+        }
+    } else {
+        std::cerr << "Leave ID " << leave.getLeaveId() << " not found. No changes made.\n";
+        remove("temp_leaves.txt"); // Clean up temporary file if no record was updated
+    }
+}
+
 void FileHandler::writeLeaveData(const Leave& leave) {
     // Open the leave file in append mode to add new leave data
     std::ofstream file("Leaves.txt", std::ios::app);
@@ -1130,18 +1207,16 @@ void showLowAttendanceReport(const std::vector<std::shared_ptr<Employee>>& emplo
     std::cout << "Low Attendance Report (Threshold: " << thresholdHours << " hours)\n";
 
     for (const auto& employee : employees) {
-        float totalHours = 0;
-        const auto& records = employee->getAttendanceRecords();
-        for (const auto& record : records) {
-            totalHours += record.getTotalHoursWorked();
-        }
-
+        float totalHours = employee->getTotalHoursWorked();
+        
         if (totalHours < thresholdHours) {
             std::cout << "Employee ID: " << employee->getEmployeeId() << "\n";
             std::cout << "Name: " << employee->getName() << "\n";
             std::cout << "Role: " << employee->getRole() << "\n";
             std::cout << "Total Hours Worked: " << totalHours << "\n";
             std::cout << "Attendance Records:\n";
+            const auto& records = employee->getAttendanceRecords();
+            
             for (const auto& record : records) {
                 record.displayAllAttendance();
             }
@@ -1319,6 +1394,7 @@ void displayEmployeeMenu(const std::shared_ptr<Employee>& employee) {
 }
 
 // Function to display Supervisor Menu
+
 void displaySupervisorMenu(Supervisor& supervisor, std::vector<std::shared_ptr<Leave>>& leaveRequests) {
     int option;
     do {
@@ -1346,8 +1422,15 @@ void displaySupervisorMenu(Supervisor& supervisor, std::vector<std::shared_ptr<L
                 // Update the leave status based on supervisor's decision
                 for (auto& leave : leaveRequests) {
                     if (leave->getLeaveId() == leaveId) {
-                        leave->setStatus(decision); // Set the leave status
+                        if (decision == "Approve") {
+                            leave->setSupervisorApproval("Yes");
+                            leave->setStatus("Approved");
+                        } else if (decision == "Reject") {
+                            leave->setSupervisorApproval("R");
+                            leave->setStatus("Rejected");
+                        }
                         supervisor.notifyLeaveApproval(decision); // Notify the supervisor's decision
+                        FileHandler::updateLeaveData(*leave); // Update the leave data in the file
                         break;
                     }
                 }
@@ -1389,8 +1472,17 @@ void displayDirectorMenu(Director& director, std::vector<std::shared_ptr<Leave>>
                 // Update the leave status based on director's decision
                 for (auto& leave : leaveRequests) {
                     if (leave->getLeaveId() == leaveId) {
-                        leave->setStatus(decision); // Set the leave status
+                        if (decision == "Approve") {
+                            leave->setDirectorApproval("Yes");
+                            if (leave->getSupervisorApproval() == "Yes") {
+                                leave->setStatus("Approved");
+                            }
+                        } else if (decision == "Reject") {
+                            leave->setDirectorApproval("R");
+                            leave->setStatus("Rejected");
+                        }
                         director.notifyLeaveApproval(decision); // Notify the director's decision
+                        FileHandler::updateLeaveData(*leave); // Update the leave data in the file
                         break;
                     }
                 }
