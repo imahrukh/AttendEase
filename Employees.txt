@@ -1,4 +1,3 @@
-Employee ID|Name|Role|Total Hours Worked|Casual Leave Balance|Earned Leave Balance
 1|John Doe|Employee|33|14|21
 2|Jane Smith|Supervisor|26|15|20
 3|Sam Williams|Employee|40|15|21
@@ -9,7 +8,3 @@ Employee ID|Name|Role|Total Hours Worked|Casual Leave Balance|Earned Leave Balan
 8|Eve Green|Employee|40|15|21
 9|Frank Blue|Supervisor|40|15|21
 10|Grace Pink|Employee|40|15|21
-
-
-
-

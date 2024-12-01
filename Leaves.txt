@@ -1,11 +1,10 @@
-LeaveId|EmployeeId|Type|Start Date|End Date|Reason|Status|Supervisor|Director
 1|1|Casual|2024-11-05|2024-11-06|Emergency|Approved|Yes|N/A
-2|2|Earned|2024-12-01|2024-12-05|Trip|Pending|Yes|No
+2|2|Earned|2024-12-01|2024-12-05|Trip|Approved|Yes|No
 3|3|Official|2024-11-10|2024-11-10|Approved|Yes|N/A
-4|4|Unpaid|2024-01-01|2024-12-31|Factory Visit|Study|Approved|Yes|Yes
-5|5|Casual|2024-11-12|2024-11-13|Sick|Approved|Yes|N/A
+4|4|Unpaid|2024-01-01|2024-12-31|Factory Visit|Study|Pending|Yes|Yes
+5|5|Casual|2024-11-12|2024-11-13|Sick|Pending|Yes|N/A
 6|6|Casual|2024-11-15|2024-11-16|Emergency|Approved|Yes|N/A
-7|7|Earned|2024-12-10|2024-12-14|Family Event|Pending|No|No
+7|7|Earned|2024-12-10|2024-12-14|Family Event|Pending|Yes|No
 8|8|Official|2024-11-20|2024-11-20|USA Visit|Approved|Yes|N/A
-9|9|Unpaid|2024-01-15|2024-12-15|Diploma|Approved|Yes|Yes
-10|10|Casual|2024-11-25|2024-11-26|Family Trip|Approved|Yes|N/A
+9|9|Unpaid|2024-01-15|2024-12-15|Diploma|Pending|Yes|Yes
+10|10|Casual|2024-11-25|2024-11-26|Family Trip|Rejected|R|N/A

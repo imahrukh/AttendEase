@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Detailed report on module Leave-->
+<CCCC_Project>
+<module_summary>
+<lines_of_code value="45" level="0" />
+<lines_of_code_per_member_function value="******" level="0" />
+<McCabes_cyclomatic_complexity value="16" level="0" />
+<McCabes_cyclomatic_complexity_per_member_function value="******" level="2" />
+<lines_of_code value="7" level="0" />
+<lines_of_code_per_member_function value="********" level="2" />
+<lines_of_code_per_line_of_comment value="6.429" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="2.286" level="0" />
+<weighted_methods_per_class_unity value="15" level="0" />
+<weighted_methods_per_class_visibility value="0" level="0" />
+<depth_of_inheritance_tree value="0" level="0" />
+<number_of_children value="0" level="0" />
+<coupling_between_objects value="2" level="0" />
+<IF4 value="1" level="0" />
+<IF4_per_member_function value="********" level="2" />
+<IF4_visible value="1" level="0" />
+<IF4_visible_per_member_function value="********" level="2" />
+<IF4_concrete value="0" level="0" />
+<IF4_concrete_per_member_function value="********" level="0" />
+</module_summary>
+<module_detail>
+</module_detail>
+<procedural_detail>
+<member_function>
+<name>Leave(int,const string &amp;,const string &amp;,const string &amp;,const string &amp;)</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="62" />
+</extent>
+<lines_of_code value="26" level="0" />
+<McCabes_cyclomatic_complexity value="6" level="0" />
+<lines_of_comment value="4" level="0" />
+<lines_of_code_per_line_of_comment value="6.500" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="1.500" level="0" />
+</member_function>
+<member_function>
+<name>displayLeaveSummary()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="110" />
+</extent>
+<lines_of_code value="6" level="0" />
+<McCabes_cyclomatic_complexity value="0" level="0" />
+<lines_of_comment value="1" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getDirectorApproval()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="102" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getDuration()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="100" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getEmployeeId()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="94" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getEndDate()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="98" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getLeaveId()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="93" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="1" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getLeaveType()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="95" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getReason()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="99" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getStartDate()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="97" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getStatus()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="96" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>getSupervisorApproval()</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="101" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="1" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>setDirectorApproval(const string &amp;)</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="107" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="0" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>setStatus(const string &amp;)</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="105" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="0" level="0" />
+<lines_of_comment value="1" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+<member_function>
+<name>setSupervisorApproval(const string &amp;)</name>
+<extent>
+<description>definition</description>
+<source_reference file="main.cpp" line="106" />
+</extent>
+<lines_of_code value="1" level="0" />
+<McCabes_cyclomatic_complexity value="0" level="0" />
+<lines_of_comment value="0" level="0" />
+<lines_of_code_per_line_of_comment value="------" level="0" />
+<McCabes_cyclomatic_complexity_per_line_of_comment value="------" level="0" />
+</member_function>
+</procedural_detail>
+<structural_detail>
+<module>
+<name>Leave</name>
+<client_module>
+<name>AttendanceReport</name>
+<visible>true</visible>
+<concrete>false</concrete>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="137" />
+</extent>
+</client_module>
+<supplier_module>
+<name>string</name>
+<visible>true</visible>
+<concrete>false</concrete>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="62" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="62" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="62" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="62" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="105" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="106" />
+</extent>
+<extent>
+<description>pass by reference</description>
+<source_reference file="main.cpp" line="107" />
+</extent>
+</supplier_module>
+</module>
+</structural_detail>
+</CCCC_Project>
